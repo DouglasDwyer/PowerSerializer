@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZstQebo24fcbCK1TrRB6N9W88eBIpdXQ9J6VpME/kJTZDWHqyW/Okgme50Pt2Pmno+FTHItG6i3kxdiTWEVBMA==",
+  "success": true,
+  "projectFilePath": "D:\\Projects\\PowerSerializer\\PowerSerializer\\PowerSerializer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Douglas\\.nuget\\packages\\dotnetcross.memory.unsafe\\0.3.1\\dotnetcross.memory.unsafe.0.3.1.nupkg.sha512",
+    "C:\\Users\\Douglas\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\Douglas\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
+    "C:\\Users\\Douglas\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
+    "C:\\Users\\Douglas\\.nuget\\packages\\system.collections.immutable\\5.0.0\\system.collections.immutable.5.0.0.nupkg.sha512",
+    "C:\\Users\\Douglas\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
+    "C:\\Users\\Douglas\\.nuget\\packages\\system.numerics.vectors\\4.4.0\\system.numerics.vectors.4.4.0.nupkg.sha512",
+    "C:\\Users\\Douglas\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.3\\system.runtime.compilerservices.unsafe.4.5.3.nupkg.sha512"
+  ],
+  "logs": []
+}

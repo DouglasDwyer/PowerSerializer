@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>This is the HOMEPAGE. </title>
+    <title>PowerSerializer </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="This is the HOMEPAGE. ">
+    <meta name="title" content="PowerSerializer ">
     <meta name="generator" content="docfx 2.54.0.0">
     
     <link rel="shortcut icon" href="favicon.ico">
@@ -60,13 +60,58 @@
         <div class="article row grid">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="this-is-the-homepage">This is the <strong>HOMEPAGE</strong>.</h1>
+<h1 id="powerserializer">PowerSerializer</h1>
 
-<p>Refer to <a href="http://daringfireball.net/projects/markdown/">Markdown</a> for how to write markdown files.</p>
-<h2 id="quick-start-notes">Quick Start Notes:</h2>
-<ol>
-<li>Add images to the <em>images</em> folder if the file is referencing an image.</li>
-</ol>
+<p>PowerSerializer is a fast, efficient, customizable C# binary serializer that can serialize absolutely anything.</p>
+<h3 id="installation">Installation</h3>
+<p>PowerSerializer can be obtained as a Nuget package. To import it into your project, either download DouglasDwyer.PowerSerializer from the Visual Studio package manager or run the command <code>Install-Package DouglasDwyer.PowerSerializer</code> using the package manager console.</p>
+<h3 id="how-to-use">How to use</h3>
+<p>PowerSerializer is robust but quite simple to use. The following code snippet serializes and then deserializes an object, storing all of the object's data in a byte array and then retrieving it:</p>
+<pre><code class="lang-csharp">PowerSerializer ser = new PowerSerializer();
+List&lt;object&gt; objs = new List&lt;object&gt;() { 73, &quot;hello&quot;, false };
+byte[] data = ser.Serialize(objs);
+List&lt;object&gt; deserialized = ser.Deserialize&lt;List&lt;object&gt;&gt;(data);
+Console.WriteLine(objs.SequenceEqual(deserialized)); //True
+</code></pre>
+<h3 id="features">Features</h3>
+<h4 id="functionality">Functionality</h4>
+<p>PowerSerializer is an object-oriented, reference-based binary serializer. Upon serialization, PowerSerializer iterates over the graph of the given object, discovering its references and primitive values, and stores them in a byte array. PowerSerializer does the opposite for deserialization. All of an object's fields - both public and nonpublic - are inspected to obtain a full graph of the object. PowerSerializer officially supports the following:</p>
+<ul>
+<li>Polymorphism and serialization of inherited types</li>
+<li>Serialization of reference types with complex object graphs, including cyclical references</li>
+<li>Serialization of strings</li>
+<li>Serialization of primitive values and other struct types, both boxed and unboxed</li>
+<li>Serialization of arrays</li>
+</ul>
+<p>Types do not need any specific designation/attribute to be serializable. However, the <code>ITypeResolver</code> associated with the serializer instance must allow for serialization of a given type in order for it to be serialized.</p>
+<h4 id="binary-format">Binary format</h4>
+<p>PowerSerializer stores objects as bit-based structs without field names. Each serialized object looks much like it would in-memory - struct types are written directly as a fixed number of bytes, and references to reference types are written as 16-bit unsigned pointers. This means that struct/class layouts must match <strong>exactly</strong> during serialization and deserialization, or deserialization will fail. This makes PowerSerializer most useful for short-term applications where object layouts shouldn't change. If cross-platform or cross-assembly compatability is important, however, PowerSerializer may be modified to store field names. A builtin PowerSerializer subclass with this functionality is planned in the future.</p>
+<h4 id="security">Security</h4>
+<p>Serialization can be a dangerous affair, especially with a library as far-reaching/nonrestrictive as PowerSerializer. As such, PowerSerializer implements some key safety features to minimize the risk of serialization-based attacks. In addition to utilizing PowerSerializer's safety features, all consumers of the library are encouraged to read more about serialization security.</p>
+<p>First and foremost, PowerSerializer does not run any code on deserialized objects by default. Custom constructors and other methods are never called. In addition, each serializer employs an <code>ITypeResolver</code>, an object that regulates which objects may be serialized/deserialized. The default type resolver is a <code>FinalizerLimitedTypeResolver</code>, which allows serialization of any type that doesn't have a finalizer. This prevents <a href="https://security.stackexchange.com/questions/13490/is-it-safe-to-binary-deserialize-user-provided-data">finalization attacks</a>. Other flavors of resolvers, like <code>ClassLimitedTypeResolver</code> (which only allows serialization of types or assemblies specified in the constructor) are available as well. Type resolvers are also used to translate type names to binary, and can be customized to allow for serialization between identical types in different assemblies.</p>
+<h4 id="thread-safety">Thread-safety</h4>
+<p>All of PowerSerializer's methods are completely thread-safe, and multiple objects may be serialized/deserialized using the same serializer instance at the same time. However, modifying an object that is currently being serialized may lead to unexpected results. While serialization will complete successfully, different parts of the object may be written to the byte array at different times. This means that a modification during serialization <em>could</em> lead to the serialization data coding for an object state that never actually existed in-memory. For example, consider the following:</p>
+<ul>
+<li>A new object, with an <code>int</code> field and a <code>string</code> field, is passed as an argument into a serializer's <code>Serialize()</code> method. The current state of the object will be denoted as (0, &quot;&quot;), where the first value is the <code>int</code> and the second the <code>string</code>. The initial serialization data contains the value (?, ?), because neither field has been written yet.</li>
+<li>Another thread increments the <code>int</code> field, changing the state of the object to (1, &quot;&quot;).</li>
+<li>The serializer serializes the <code>int</code> field, and the serialization data is now (1, ?).</li>
+<li>The other thread decrements the <code>int</code> field, and then sets the <code>string</code> to &quot;hello&quot;, changing the state of the object to (0, &quot;hello&quot;).</li>
+<li>The serializer serializes the <code>string</code> field, resulting in a serialized object of (1, &quot;hello&quot;).</li>
+</ul>
+<p>Though this situation is exceedingly rare, users should be wary of modifying their objects during serialization. Concurrent modifications can result in a serialized object whose state never existed in-memory; (1, &quot;hello&quot;) was the result of the above example's serialization, but the object's value was never (1, &quot;hello&quot;).</p>
+<h4 id="extensibility">Extensibility</h4>
+<p>PowerSerializer is designed specifically for customizability. Most of its methods can be overridden to provide for custom behavior during serialization/deserialization (like re-hashing a dictionary's elements), allowing for PowerSerializer to meet a wide variety of needs.</p>
+<h3 id="api-reference">API Reference</h3>
+<p>For documentation about each type included in PowerSerializer, please see the <a href="https://douglasdwyer.github.io/PowerSerializer/">complete API reference</a>.</p>
+<h3 id="basic-concepts">Basic concepts</h3>
+<h4 id="serialization">Serialization</h4>
+<p>Serialization begins when a user calls the <code>Serialize</code> method on a serializer instance. If the object to serialize is null, it is replaced with an internal class called <code>NullRepresentative</code>, because the serializer does allow serializing a completely null value. The serializer then calls <code>CreatePowerSerializationContext</code> to create a new serialization context where the growing object graph and type list are stored. The object graph is stored as a linear list, and the index of each object in the graph represents the pointer number used to refer to that object in the byte array.</p>
+<p>The object graph begins by containing just the object to serialize. <code>SerializeObject</code> is called on the object to serialize, and its fields are inspected. Any value-type fields are written directly to the byte array, and any reference-type fields are added to the object graph. The references of each field are written to the byte array using the <code>WriteObjectReference</code> method. <code>SerializeObject</code> is then called again on each of the new objects in the object graph until the end of the graph is reached.</p>
+<p>Lastly, all of the type IDs are written to the byte array by calling <code>TypeResolver.WriteTypeID</code>. Then, the resulting byte array is returned.</p>
+<h4 id="deserialization">Deserialization</h4>
+<p>Deserialization begins when a user calls the <code>Deserialize()</code> method on a deserializer instance. <code>CreatePowerDeserializationContext</code> is called to create a new deserialization context where the growing object graph and type list are stored. The serializer then reads the type IDs from the end of the byte array, calling <code>TypeResolver.ReadTypeID</code> to obtain each type.</p>
+<p>The serializer then calls <code>ReadAndCreateObject</code> to create a new object of the specified type. That object is then added to the object graph, and <code>DeserializeObject</code> is called on it, reading value-typed fields directly from the byte array and object references using <code>ReadObjectReference</code>. This process is repeated with each of the new objects in the object graph until the end of the graph is reached.</p>
+<p>Lastly, <code>ProcessObjectGraph</code> is called to make any last-minute adjustments to the object graph, and it returns the final deserialized object.</p>
 </article>
           </div>
           
@@ -74,6 +119,9 @@
             <div class="sideaffix">
               <div class="contribution">
                 <ul class="nav">
+                  <li>
+                    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/docfx_project/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
                 </ul>
               </div>
               <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">

@@ -1,0 +1,330 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DouglasDwyer.PowerSerializer</name>
+    </assembly>
+    <members>
+        <member name="T:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver">
+            <summary>
+            Instances of <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver"/> allow for serialization of all the classes specified in the constructor, as well as all structs loaded at resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.#ctor">
+            <summary>
+            Creates a new resolver instance, allowing all currently-loaded classes in the current assembly to be serialized.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.#ctor(System.Reflection.Assembly[])">
+            <summary>
+            Creates a new resolver instance, allowing all currently-loaded classes in the given assemblies to be serialized.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.#ctor(System.Collections.Generic.IEnumerable{System.Reflection.Assembly})">
+            <summary>
+            Creates a new resolver instance, allowing all currently-loaded classes in the given assemblies to be serialized.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.#ctor(System.Type[])">
+            <summary>
+            Creates a new resolver instance, allowing all of the given classes to be serialized.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.#ctor(System.Collections.Generic.IEnumerable{System.Type})">
+            <summary>
+            Creates a new resolver instance, allowing all of the given classes to be serialized.
+            </summary>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver">
+            <summary>
+            Instances of <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver"/> allow for serialization of any type loaded in the current <see cref="T:System.AppDomain"/> upon resolver construction, provided that the type doesn't have a finalizer. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.#ctor">
+            <summary>
+            Creates a new resolver instance, allowing all currently-loaded types without a finalizer to be serialized.
+            </summary>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.FullGuidTypeResolver">
+            <summary>
+            Instances of <see cref="T:DouglasDwyer.PowerSerializer.FullGuidTypeResolver"/> allow for serialization of any and all types loaded in the current <see cref="T:System.AppDomain"/> upon resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
+            </summary>
+            <remarks>Allowing deserialization of all types is dangerous unless the data to be deserialized is fully trusted. Attackers can submit deserialization payloads that generate objects in invalid states, or objects that may cause unwanted code execution during their finalization routines. Consider using a <see cref="T:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver"/> or <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver"/> instead to minimize security risks.</remarks>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.FullGuidTypeResolver.#ctor">
+            <summary>
+            Creates a new resolver instance, allowing all types currently loaded in the <see cref="T:System.AppDomain"/> to be serialized.
+            </summary>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.GuidTypeResolver">
+            <summary>
+            Instances of <see cref="T:DouglasDwyer.PowerSerializer.GuidTypeResolver"/> utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries. They allow for serialization of any type specified in the constructor.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.GuidTypeResolver.#ctor(System.Collections.Generic.IEnumerable{System.Type})">
+            <summary>
+            Creates a new resolver instance with the given type list. The resolver will only allow serialization of those specified types.
+            </summary>
+            <param name="allowedTypes">The types to allow during serialization.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.GuidTypeResolver.GetTypeName(System.Type)">
+            <summary>
+            Returns a string identifying the given type. By default, this returns the assembly-qualified name, but this can be overriden to allow for serialization between different assemblies.
+            </summary>
+            <param name="type">The type to examine.</param>
+            <returns>A name that uniquely identifies the type.</returns>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.PowerDeserializationContext">
+            <summary>
+            Stores data about a <see cref="T:DouglasDwyer.PowerSerializer.PowerSerializer"/>'s deserialization operation, including a list of serialized types as well as the current object graph. This class, along with <see cref="M:DouglasDwyer.PowerSerializer.PowerSerializer.CreateDeserializationContext"/>, may be overriden to store additional information.
+            </summary>
+        </member>
+        <member name="P:DouglasDwyer.PowerSerializer.PowerDeserializationContext.ObjectGraph">
+            <summary>
+            A list of the currently-known heap-based objects being deserialized. This list is updated as additional objects are deserialized. It does not contain value types that exist as part of a reference type's data; structs will only appear in this list if they are boxed as objects.
+            </summary>
+        </member>
+        <member name="P:DouglasDwyer.PowerSerializer.PowerDeserializationContext.IncludedTypes">
+            <summary>
+            A list of all the types included in deserialization. It does not contain value types that exist as part of a reference type's data; struct types will only appear in this list if their instances are boxed as objects.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerDeserializationContext.#ctor">
+            <summary>
+            Creates a deserialization context for a new deserialization operation.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerDeserializationContext.GetTypeFromID(System.UInt16)">
+            <summary>
+            Gets type associated with a given ID, or throws an exception if the type isn't registered in the known types list.
+            </summary>
+            <param name="type">The ID of the type to retrieve.</param>
+            <returns>The identified type.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerDeserializationContext.HasObject(System.UInt16)">
+            <summary>
+            Returns whether the given object is already instantiated and registered in the object graph.
+            </summary>
+            <param name="obj">The ID of the object to check.</param>
+            <returns>Whether the object is already in the deserialization object graph.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerDeserializationContext.GetObject(System.UInt16)">
+            <summary>
+            Returns the object with the given reference ID, or throws an exception if the object isn't registered in the object graph.
+            </summary>
+            <param name="obj">The ID of the object to retrieve.</param>
+            <returns>The identified object.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerDeserializationContext.RegisterNextObject(System.Object)">
+            <summary>
+            Registers the object that has the next reference ID in the object graph.
+            </summary>
+            <param name="obj">The object to register.</param>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.PowerSerializationContext">
+            <summary>
+            Stores data about a <see cref="T:DouglasDwyer.PowerSerializer.PowerSerializer"/>'s serialization operation, including a list of serialized types as well as the current object graph. This class, along with <see cref="M:DouglasDwyer.PowerSerializer.PowerSerializer.CreateSerializationContext"/>, may be overriden to store additional information.
+            </summary>
+        </member>
+        <member name="P:DouglasDwyer.PowerSerializer.PowerSerializationContext.ObjectGraph">
+            <summary>
+            A list the currently-known heap-based objects being serialized. This list is updated as additional objects are serialized. It does not contain value types that exist as part of a reference type's data; structs will only appear in this list if they are boxed as objects.
+            </summary>
+        </member>
+        <member name="P:DouglasDwyer.PowerSerializer.PowerSerializationContext.IncludedTypes">
+            <summary>
+            A list of the currently-known types included in serialization. This list is updated as additional objects are serialized. It does not contain value types that exist as part of a reference type's data; struct types will only appear in this list if their instances are boxed as objects.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializationContext.#ctor">
+            <summary>
+            Creates a serialization context for a new serialization operation.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializationContext.HasObject(System.Object)">
+            <summary>
+            Returns whether the given object is already registered in the object graph.
+            </summary>
+            <param name="obj">The object to check.</param>
+            <returns>Whether the object is already in the serialization object graph.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializationContext.GetObjectID(System.Object)">
+            <summary>
+            Returns the reference ID of the given object, or throws an exception if the object isn't registered in the object graph.
+            </summary>
+            <param name="obj">The object to examine.</param>
+            <returns>The ID of the object.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializationContext.RegisterObject(System.Object)">
+            <summary>
+            Registers an object in the object graph and adds its type to the list of known types, returning the object's type and assigned ID.
+            </summary>
+            <param name="obj">The object to register.</param>
+            <returns>A tuple containing the ID of the object and the type of the object.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializationContext.GetTypeID(System.Type)">
+            <summary>
+            Gets the ID for a given type, or throws an exception if the type isn't registered in the known types list.
+            </summary>
+            <param name="type">The type to examine.</param>
+            <returns>The ID of the type.</returns>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.PowerSerializer">
+            <summary>
+            Allows for customizable binary serialization and deserialization of complex types. Instances of <see cref="T:DouglasDwyer.PowerSerializer.PowerSerializer"/> can serialize absolutely anything, provided that their type resolver allows it.
+            </summary>
+        </member>
+        <member name="P:DouglasDwyer.PowerSerializer.PowerSerializer.TypeResolver">
+            <summary>
+            The resolver used to identify/verify serialized types.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.#ctor">
+            <summary>
+            Creates a new serializer instance with a <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver"/> limited to types without finalizers.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.#ctor(DouglasDwyer.PowerSerializer.ITypeResolver)">
+            <summary>
+            Creates a new serializer instance with the specified type resolver.
+            </summary>
+            <param name="resolver">The type resolver that should be used during serialization/deseriation for identifing/verifying types.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.Serialize(System.Object)">
+            <summary>
+            Serializes an object to a byte array.
+            </summary>
+            <param name="obj">The object to serialize.</param>
+            <returns>A byte-based representation of the object.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.Deserialize(System.Byte[])">
+            <summary>
+            Deserializes an object from a byte array.
+            </summary>
+            <param name="data">The byte-based representation of the object.</param>
+            <returns>The deserialized object.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.Deserialize``1(System.Byte[])">
+            <summary>
+            Deserializes an object from a byte array.
+            </summary>
+            <typeparam name="T">The type of the deserialized object.</typeparam>
+            <param name="data">The byte-based representation of the object.</param>
+            <returns>The deserialized object.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.CreateSerializationContext">
+            <summary>
+            Creates a new serialization context for storing data about a serialization operation.
+            </summary>
+            <returns>The new serialization context.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.CreateDeserializationContext">
+            <summary>
+            Creates a new deserialization context for storing data about a deserialization operation.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.ProcessObjectGraph(DouglasDwyer.PowerSerializer.PowerDeserializationContext)">
+            <summary>
+            Processes the generated object graph, makes any last-minute changes if necessary, and returns the deserialized object.
+            </summary>
+            <param name="context">The current deserialization context.</param>
+            <returns>The final deserialized object.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.SerializeObject(DouglasDwyer.PowerSerializer.PowerSerializationContext,System.IO.BinaryWriter,System.Object,System.Type)">
+            <summary>
+            Serializes the given object, writing its object references and primitive data to the given binary writer. Referenced objects are not serialized, but are added to the object graph.
+            </summary>
+            <param name="context">The current serialization context, with data about the current object graph and known types.</param>
+            <param name="writer">The binary writer to utilize.</param>
+            <param name="obj">The object that should be serialized.</param>
+            <param name="type">The type of the current object.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.WriteObjectReference(DouglasDwyer.PowerSerializer.PowerSerializationContext,System.IO.BinaryWriter,System.Object)">
+            <summary>
+            Writes an object reference to the given binary writer. If the object has not been referenced before, its type is also stored, along with any immutable type data (like the contents of a string).
+            </summary>
+            <param name="context">The current serialization context, with data about the current object graph and known types.</param>
+            <param name="writer">The binary writer to utilize.</param>
+            <param name="obj">The object being referenced.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.DeserializeObject(DouglasDwyer.PowerSerializer.PowerDeserializationContext,System.IO.BinaryReader,System.Object,System.Type)">
+            <summary>
+            Deserializes the given object, populating its fields by reading its object references and primitive data from the given binary reader.
+            </summary>
+            <param name="context">The current deserialization context, with data about the current object graph and known types.</param>
+            <param name="reader">The binary reader to utilize.</param>
+            <param name="obj">The object whose fields should be populated.</param>
+            <param name="type">The type of the deserialized object.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.ReadObjectReference(DouglasDwyer.PowerSerializer.PowerDeserializationContext,System.IO.BinaryReader)">
+            <summary>
+            Reads an object reference from the given binary reader. If the object has not been referenced before, a new object of the specified type is instantiated.
+            </summary>
+            <param name="context">The current deserialization context, with data about the current object graph and known types.</param>
+            <param name="reader">The binary reader to utilize.</param>
+            <returns>The referenced object.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.ReadAndCreateObject(DouglasDwyer.PowerSerializer.PowerDeserializationContext,System.IO.BinaryReader,System.Type)">
+            <summary>
+            Reads an object's data from the specified binary reader and creates a new instance of that object with the given data. For user-defined types, a new object of the specified type is returned without any fields initialized. For arrays, a new object with the correct rank lengths is returned. For strings and primitives, an object with the correct value is returned.
+            </summary>
+            <param name="context">The current deserialization context, with data about the current object graph and known types.</param>
+            <param name="reader">The binary reader to utilize.</param>
+            <param name="type">The type of the object to create.</param>
+            <returns>The created object.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.WritePrimitiveObject(System.IO.BinaryWriter,System.Object)">
+            <summary>
+            Writes the value of a primitive object to the writer.
+            </summary>
+            <param name="writer">The binary writer to utilize.</param>
+            <param name="primitive">The object to write.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.ReadPrimitiveObject(System.IO.BinaryReader,System.Type)">
+            <summary>
+            Reads the value of a primitive object from the reader.
+            </summary>
+            <param name="reader">The binary reader to utilize.</param>
+            <param name="type">The type of the primitive to read.</param>
+            <returns>The primitive value.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.CheckTypeAllowance(System.Type)">
+            <summary>
+            Checks whether serialization of a type is allowed under the current type resovler, and throws an exception if serialization is forbidden.
+            </summary>
+            <param name="type">The type to check.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.Clone">
+            <summary>
+            Creates a memberwise copy of this object, returning a <see cref="T:DouglasDwyer.PowerSerializer.PowerSerializer"/> with the same settings as the original.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.ITypeResolver">
+            <summary>
+            Types that implement <see cref="T:DouglasDwyer.PowerSerializer.ITypeResolver"/> mediate which types can be serialized/deserialized by a <see cref="T:DouglasDwyer.PowerSerializer.PowerSerializer"/>. Additionally, they each provide a way to identify types across serialization boundaries.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ITypeResolver.IsTypeSerializable(System.Type)">
+            <summary>
+            Returns whether the given type should be serialized or deserialized.
+            </summary>
+            <param name="type">The type to examine.</param>
+            <returns>Whether the type is serializable.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ITypeResolver.WriteTypeID(System.IO.BinaryWriter,System.Type)">
+            <summary>
+            Writes a binary representation of the given type's identity to the given binary writer's stream.
+            </summary>
+            <param name="writer">The binary writer to utilize.</param>
+            <param name="type">The type whose ID should be written.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ITypeResolver.ReadTypeID(System.IO.BinaryReader)">
+            <summary>
+            Reads the binary representation of a type's identity from the given binary reader's stream and returns the type.
+            </summary>
+            <param name="reader">The binary reader from which to read.</param>
+            <returns>The type whose ID was written to the reader's stream.</returns>
+        </member>
+    </members>
+</doc>

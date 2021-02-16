@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -15,6 +15,15 @@
     <RepositoryUrl>https://github.com/DouglasDwyer/PowerSerializer</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en</NeutralLanguage>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
+    <PackageReleaseNotes>Added documentation and tags.</PackageReleaseNotes>
+    <PackageTags>serialization csharp binary collections arrays polymorphism serialization-library csharp-library</PackageTags>
+    <Version>1.0.0.1</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>D:\Projects\PowerSerializer\PowerSerializer\DouglasDwyer.PowerSerializer.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

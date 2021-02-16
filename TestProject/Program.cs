@@ -18,7 +18,7 @@ namespace TestProject
             List<object> objs = new List<object>() { 73, "hello", null };
             byte[] data = ser.Serialize(objs);
             List<object> deserialized = ser.Deserialize<List<object>>(data);
-            Console.WriteLine(objs.SequenceEqual(deserialized)); //True
+            Console.WriteLine(objs.SequenceEqual(deserialized)); 
 
             Console.ReadKey();
         }

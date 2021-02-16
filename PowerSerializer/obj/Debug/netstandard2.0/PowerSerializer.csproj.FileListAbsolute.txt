@@ -7,3 +7,4 @@ D:\Projects\PowerSerializer\PowerSerializer\bin\Debug\netstandard2.0\DouglasDwye
 D:\Projects\PowerSerializer\PowerSerializer\bin\Debug\netstandard2.0\DouglasDwyer.PowerSerializer.pdb
 D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\DouglasDwyer.PowerSerializer.dll
 D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\DouglasDwyer.PowerSerializer.pdb
+D:\Projects\PowerSerializer\PowerSerializer\bin\Debug\netstandard2.0\DouglasDwyer.PowerSerializer.xml

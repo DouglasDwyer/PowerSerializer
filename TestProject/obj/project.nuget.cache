@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "7UyQJ7M2kiE+UFOlEsfH0VTXkjEUxkro0z44xBOdlJLkwINCj9AYTtMceysB9aCIO7Mbyda3eFErRt+TQIVzHw==",
+  "success": true,
+  "projectFilePath": "D:\\Projects\\PowerSerializer\\TestProject\\TestProject.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Douglas\\.nuget\\packages\\system.collections.immutable\\5.0.0\\system.collections.immutable.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

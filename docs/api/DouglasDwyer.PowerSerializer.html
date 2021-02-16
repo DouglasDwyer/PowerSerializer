@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Namespace DouglasDwyer.PowerSerializer
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Namespace DouglasDwyer.PowerSerializer
+   ">
+    <meta name="generator" content="docfx 2.54.0.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="DouglasDwyer.PowerSerializer">
+  
+  <h1 id="DouglasDwyer_PowerSerializer" data-uid="DouglasDwyer.PowerSerializer" class="text-break">Namespace DouglasDwyer.PowerSerializer
+  </h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+    <h3 id="classes">Classes
+  </h3>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.html">ClassLimitedTypeResolver</a></h4>
+      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html">FinalizerLimitedTypeResolver</a> allow for serialization of all the classes specified in the constructor, as well as all structs loaded at resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.</p>
+</section>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html">FinalizerLimitedTypeResolver</a></h4>
+      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html">FinalizerLimitedTypeResolver</a> allow for serialization of any type loaded in the current <span class="xref">System.AppDomain</span> upon resolver construction, provided that the type doesn't have a finalizer. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.</p>
+</section>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.FullGuidTypeResolver.html">FullGuidTypeResolver</a></h4>
+      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.FullGuidTypeResolver.html">FullGuidTypeResolver</a> allow for serialization of any and all types loaded in the current <span class="xref">System.AppDomain</span> upon resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.</p>
+</section>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.GuidTypeResolver.html">GuidTypeResolver</a></h4>
+      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.GuidTypeResolver.html">GuidTypeResolver</a> utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries. They allow for serialization of any type specified in the constructor.</p>
+</section>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.PowerDeserializationContext.html">PowerDeserializationContext</a></h4>
+      <section><p>Stores data about a <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html">PowerSerializer</a>'s deserialization operation, including a list of serialized types as well as the current object graph. This class, along with <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html#DouglasDwyer_PowerSerializer_PowerSerializer_CreateDeserializationContext">CreateDeserializationContext()</a>, may be overriden to store additional information.</p>
+</section>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializationContext.html">PowerSerializationContext</a></h4>
+      <section><p>Stores data about a <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html">PowerSerializer</a>'s serialization operation, including a list of serialized types as well as the current object graph. This class, along with <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html#DouglasDwyer_PowerSerializer_PowerSerializer_CreateSerializationContext">CreateSerializationContext()</a>, may be overriden to store additional information.</p>
+</section>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html">PowerSerializer</a></h4>
+      <section><p>Allows for customizable binary serialization and deserialization of complex types. Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html">PowerSerializer</a> can serialize absolutely anything, provided that their type resolver allows it.</p>
+</section>
+    <h3 id="interfaces">Interfaces
+  </h3>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.ITypeResolver.html">ITypeResolver</a></h4>
+      <section><p>Types that implement <a class="xref" href="DouglasDwyer.PowerSerializer.ITypeResolver.html">ITypeResolver</a> mediate which types can be serialized/deserialized by a <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html">PowerSerializer</a>. Additionally, they each provide a way to identify types across serialization boundaries.</p>
+</section>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

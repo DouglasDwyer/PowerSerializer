@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerSerializer", "PowerSerializer\PowerSerializer.csproj", "{AF6BE2A6-A45D-4A66-903D-655D5CAF6E16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{F6F0609A-9094-42AB-A6E3-7A69406F8DAF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF6BE2A6-A45D-4A66-903D-655D5CAF6E16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF6BE2A6-A45D-4A66-903D-655D5CAF6E16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF6BE2A6-A45D-4A66-903D-655D5CAF6E16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF6BE2A6-A45D-4A66-903D-655D5CAF6E16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6F0609A-9094-42AB-A6E3-7A69406F8DAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6F0609A-9094-42AB-A6E3-7A69406F8DAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6F0609A-9094-42AB-A6E3-7A69406F8DAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6F0609A-9094-42AB-A6E3-7A69406F8DAF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF258A1E-30F1-45E6-977E-8BD47530C658}
+	EndGlobalSection
+EndGlobal

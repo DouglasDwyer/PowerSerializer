@@ -1,0 +1,17 @@
+D:\Projects\PowerSerializer\TestProject\bin\Debug\netcoreapp3.1\TestProject.exe
+D:\Projects\PowerSerializer\TestProject\bin\Debug\netcoreapp3.1\TestProject.deps.json
+D:\Projects\PowerSerializer\TestProject\bin\Debug\netcoreapp3.1\TestProject.runtimeconfig.json
+D:\Projects\PowerSerializer\TestProject\bin\Debug\netcoreapp3.1\TestProject.runtimeconfig.dev.json
+D:\Projects\PowerSerializer\TestProject\bin\Debug\netcoreapp3.1\TestProject.dll
+D:\Projects\PowerSerializer\TestProject\bin\Debug\netcoreapp3.1\TestProject.pdb
+D:\Projects\PowerSerializer\TestProject\bin\Debug\netcoreapp3.1\System.Collections.Immutable.dll
+D:\Projects\PowerSerializer\TestProject\obj\Debug\netcoreapp3.1\TestProject.csprojAssemblyReference.cache
+D:\Projects\PowerSerializer\TestProject\obj\Debug\netcoreapp3.1\TestProject.AssemblyInfoInputs.cache
+D:\Projects\PowerSerializer\TestProject\obj\Debug\netcoreapp3.1\TestProject.AssemblyInfo.cs
+D:\Projects\PowerSerializer\TestProject\obj\Debug\netcoreapp3.1\TestProject.csproj.CoreCompileInputs.cache
+D:\Projects\PowerSerializer\TestProject\obj\Debug\netcoreapp3.1\TestProject.csproj.CopyComplete
+D:\Projects\PowerSerializer\TestProject\obj\Debug\netcoreapp3.1\TestProject.dll
+D:\Projects\PowerSerializer\TestProject\obj\Debug\netcoreapp3.1\TestProject.pdb
+D:\Projects\PowerSerializer\TestProject\obj\Debug\netcoreapp3.1\TestProject.genruntimeconfig.cache
+D:\Projects\PowerSerializer\TestProject\bin\Debug\netcoreapp3.1\DouglasDwyer.PowerSerializer.dll
+D:\Projects\PowerSerializer\TestProject\bin\Debug\netcoreapp3.1\DouglasDwyer.PowerSerializer.pdb

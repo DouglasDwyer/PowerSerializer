@@ -1,0 +1,958 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class PowerSerializer
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class PowerSerializer
+   ">
+    <meta name="generator" content="docfx 2.54.0.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer">
+  
+  
+  <h1 id="DouglasDwyer_PowerSerializer_PowerSerializer" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer" class="text-break">Class PowerSerializer
+  </h1>
+  <div class="markdown level0 summary"><p>Allows for customizable binary serialization and deserialization of complex types. Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html">PowerSerializer</a> can serialize absolutely anything, provided that their type resolver allows it.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">PowerSerializer</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.ICloneable</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="DouglasDwyer.PowerSerializer.html">DouglasDwyer.PowerSerializer</a></h6>
+  <h6><strong>Assembly</strong>: DouglasDwyer.PowerSerializer.dll</h6>
+  <h5 id="DouglasDwyer_PowerSerializer_PowerSerializer_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class PowerSerializer : ICloneable</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer__ctor.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.%23ctor%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L23">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer__ctor_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.#ctor*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer__ctor" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.#ctor">PowerSerializer()</h4>
+  <div class="markdown level1 summary"><p>Creates a new serializer instance with a <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html">FinalizerLimitedTypeResolver</a> limited to types without finalizers.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PowerSerializer()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer__ctor_DouglasDwyer_PowerSerializer_ITypeResolver_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.%23ctor(DouglasDwyer.PowerSerializer.ITypeResolver)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L29">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer__ctor_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.#ctor*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer__ctor_DouglasDwyer_PowerSerializer_ITypeResolver_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.#ctor(DouglasDwyer.PowerSerializer.ITypeResolver)">PowerSerializer(ITypeResolver)</h4>
+  <div class="markdown level1 summary"><p>Creates a new serializer instance with the specified type resolver.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PowerSerializer(ITypeResolver resolver)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.ITypeResolver.html">ITypeResolver</a></td>
+        <td><span class="parametername">resolver</span></td>
+        <td><p>The type resolver that should be used during serialization/deseriation for identifing/verifying types.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_TypeResolver.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.TypeResolver%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L18">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_TypeResolver_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.TypeResolver*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_TypeResolver" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.TypeResolver">TypeResolver</h4>
+  <div class="markdown level1 summary"><p>The resolver used to identify/verify serialized types.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ITypeResolver TypeResolver { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.ITypeResolver.html">ITypeResolver</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_CheckTypeAllowance_System_Type_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.CheckTypeAllowance(System.Type)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L668">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_CheckTypeAllowance_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.CheckTypeAllowance*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_CheckTypeAllowance_System_Type_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.CheckTypeAllowance(System.Type)">CheckTypeAllowance(Type)</h4>
+  <div class="markdown level1 summary"><p>Checks whether serialization of a type is allowed under the current type resovler, and throws an exception if serialization is forbidden.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void CheckTypeAllowance(Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type to check.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_Clone.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.Clone%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L680">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_Clone_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.Clone*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_Clone" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.Clone">Clone()</h4>
+  <div class="markdown level1 summary"><p>Creates a memberwise copy of this object, returning a <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html">PowerSerializer</a> with the same settings as the original.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual object Clone()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_CreateDeserializationContext.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.CreateDeserializationContext%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L159">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_CreateDeserializationContext_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.CreateDeserializationContext*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_CreateDeserializationContext" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.CreateDeserializationContext">CreateDeserializationContext()</h4>
+  <div class="markdown level1 summary"><p>Creates a new deserialization context for storing data about a deserialization operation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual PowerDeserializationContext CreateDeserializationContext()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.PowerDeserializationContext.html">PowerDeserializationContext</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_CreateSerializationContext.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.CreateSerializationContext%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L150">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_CreateSerializationContext_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.CreateSerializationContext*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_CreateSerializationContext" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.CreateSerializationContext">CreateSerializationContext()</h4>
+  <div class="markdown level1 summary"><p>Creates a new serialization context for storing data about a serialization operation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual PowerSerializationContext CreateSerializationContext()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializationContext.html">PowerSerializationContext</a></td>
+        <td><p>The new serialization context.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_Deserialize_System_Byte___.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.Deserialize(System.Byte%5B%5D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L100">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_Deserialize_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.Deserialize*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_Deserialize_System_Byte___" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.Deserialize(System.Byte[])">Deserialize(Byte[])</h4>
+  <div class="markdown level1 summary"><p>Deserializes an object from a byte array.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual object Deserialize(byte[] data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Byte</span>[]</td>
+        <td><span class="parametername">data</span></td>
+        <td><p>The byte-based representation of the object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><p>The deserialized object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_Deserialize__1_System_Byte___.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.Deserialize%60%601(System.Byte%5B%5D)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L141">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_Deserialize_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.Deserialize*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_Deserialize__1_System_Byte___" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.Deserialize``1(System.Byte[])">Deserialize&lt;T&gt;(Byte[])</h4>
+  <div class="markdown level1 summary"><p>Deserializes an object from a byte array.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual T Deserialize&lt;T&gt;(byte[] data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Byte</span>[]</td>
+        <td><span class="parametername">data</span></td>
+        <td><p>The byte-based representation of the object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">T</span></td>
+        <td><p>The deserialized object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">T</span></td>
+        <td><p>The type of the deserialized object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_DeserializeObject_DouglasDwyer_PowerSerializer_PowerDeserializationContext_System_IO_BinaryReader_System_Object_System_Type_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.DeserializeObject(DouglasDwyer.PowerSerializer.PowerDeserializationContext%2CSystem.IO.BinaryReader%2CSystem.Object%2CSystem.Type)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L290">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_DeserializeObject_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.DeserializeObject*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_DeserializeObject_DouglasDwyer_PowerSerializer_PowerDeserializationContext_System_IO_BinaryReader_System_Object_System_Type_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.DeserializeObject(DouglasDwyer.PowerSerializer.PowerDeserializationContext,System.IO.BinaryReader,System.Object,System.Type)">DeserializeObject(PowerDeserializationContext, BinaryReader, Object, Type)</h4>
+  <div class="markdown level1 summary"><p>Deserializes the given object, populating its fields by reading its object references and primitive data from the given binary reader.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void DeserializeObject(PowerDeserializationContext context, BinaryReader reader, object obj, Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.PowerDeserializationContext.html">PowerDeserializationContext</a></td>
+        <td><span class="parametername">context</span></td>
+        <td><p>The current deserialization context, with data about the current object graph and known types.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.IO.BinaryReader</span></td>
+        <td><span class="parametername">reader</span></td>
+        <td><p>The binary reader to utilize.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>The object whose fields should be populated.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type of the deserialized object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_ProcessObjectGraph_DouglasDwyer_PowerSerializer_PowerDeserializationContext_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.ProcessObjectGraph(DouglasDwyer.PowerSerializer.PowerDeserializationContext)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L169">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_ProcessObjectGraph_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.ProcessObjectGraph*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_ProcessObjectGraph_DouglasDwyer_PowerSerializer_PowerDeserializationContext_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.ProcessObjectGraph(DouglasDwyer.PowerSerializer.PowerDeserializationContext)">ProcessObjectGraph(PowerDeserializationContext)</h4>
+  <div class="markdown level1 summary"><p>Processes the generated object graph, makes any last-minute changes if necessary, and returns the deserialized object.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual object ProcessObjectGraph(PowerDeserializationContext context)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.PowerDeserializationContext.html">PowerDeserializationContext</a></td>
+        <td><span class="parametername">context</span></td>
+        <td><p>The current deserialization context.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><p>The final deserialized object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_ReadAndCreateObject_DouglasDwyer_PowerSerializer_PowerDeserializationContext_System_IO_BinaryReader_System_Type_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.ReadAndCreateObject(DouglasDwyer.PowerSerializer.PowerDeserializationContext%2CSystem.IO.BinaryReader%2CSystem.Type)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L375">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_ReadAndCreateObject_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.ReadAndCreateObject*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_ReadAndCreateObject_DouglasDwyer_PowerSerializer_PowerDeserializationContext_System_IO_BinaryReader_System_Type_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.ReadAndCreateObject(DouglasDwyer.PowerSerializer.PowerDeserializationContext,System.IO.BinaryReader,System.Type)">ReadAndCreateObject(PowerDeserializationContext, BinaryReader, Type)</h4>
+  <div class="markdown level1 summary"><p>Reads an object's data from the specified binary reader and creates a new instance of that object with the given data. For user-defined types, a new object of the specified type is returned without any fields initialized. For arrays, a new object with the correct rank lengths is returned. For strings and primitives, an object with the correct value is returned.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual object ReadAndCreateObject(PowerDeserializationContext context, BinaryReader reader, Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.PowerDeserializationContext.html">PowerDeserializationContext</a></td>
+        <td><span class="parametername">context</span></td>
+        <td><p>The current deserialization context, with data about the current object graph and known types.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.IO.BinaryReader</span></td>
+        <td><span class="parametername">reader</span></td>
+        <td><p>The binary reader to utilize.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type of the object to create.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><p>The created object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_ReadObjectReference_DouglasDwyer_PowerSerializer_PowerDeserializationContext_System_IO_BinaryReader_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.ReadObjectReference(DouglasDwyer.PowerSerializer.PowerDeserializationContext%2CSystem.IO.BinaryReader)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L351">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_ReadObjectReference_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.ReadObjectReference*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_ReadObjectReference_DouglasDwyer_PowerSerializer_PowerDeserializationContext_System_IO_BinaryReader_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.ReadObjectReference(DouglasDwyer.PowerSerializer.PowerDeserializationContext,System.IO.BinaryReader)">ReadObjectReference(PowerDeserializationContext, BinaryReader)</h4>
+  <div class="markdown level1 summary"><p>Reads an object reference from the given binary reader. If the object has not been referenced before, a new object of the specified type is instantiated.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual object ReadObjectReference(PowerDeserializationContext context, BinaryReader reader)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.PowerDeserializationContext.html">PowerDeserializationContext</a></td>
+        <td><span class="parametername">context</span></td>
+        <td><p>The current deserialization context, with data about the current object graph and known types.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.IO.BinaryReader</span></td>
+        <td><span class="parametername">reader</span></td>
+        <td><p>The binary reader to utilize.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><p>The referenced object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_ReadPrimitiveObject_System_IO_BinaryReader_System_Type_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.ReadPrimitiveObject(System.IO.BinaryReader%2CSystem.Type)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L582">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_ReadPrimitiveObject_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.ReadPrimitiveObject*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_ReadPrimitiveObject_System_IO_BinaryReader_System_Type_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.ReadPrimitiveObject(System.IO.BinaryReader,System.Type)">ReadPrimitiveObject(BinaryReader, Type)</h4>
+  <div class="markdown level1 summary"><p>Reads the value of a primitive object from the reader.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual object ReadPrimitiveObject(BinaryReader reader, Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.IO.BinaryReader</span></td>
+        <td><span class="parametername">reader</span></td>
+        <td><p>The binary reader to utilize.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type of the primitive to read.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><p>The primitive value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_Serialize_System_Object_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.Serialize(System.Object)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L39">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_Serialize_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.Serialize*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_Serialize_System_Object_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.Serialize(System.Object)">Serialize(Object)</h4>
+  <div class="markdown level1 summary"><p>Serializes an object to a byte array.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual byte[] Serialize(object obj)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>The object to serialize.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Byte</span>[]</td>
+        <td><p>A byte-based representation of the object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_SerializeObject_DouglasDwyer_PowerSerializer_PowerSerializationContext_System_IO_BinaryWriter_System_Object_System_Type_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.SerializeObject(DouglasDwyer.PowerSerializer.PowerSerializationContext%2CSystem.IO.BinaryWriter%2CSystem.Object%2CSystem.Type)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L181">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_SerializeObject_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.SerializeObject*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_SerializeObject_DouglasDwyer_PowerSerializer_PowerSerializationContext_System_IO_BinaryWriter_System_Object_System_Type_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.SerializeObject(DouglasDwyer.PowerSerializer.PowerSerializationContext,System.IO.BinaryWriter,System.Object,System.Type)">SerializeObject(PowerSerializationContext, BinaryWriter, Object, Type)</h4>
+  <div class="markdown level1 summary"><p>Serializes the given object, writing its object references and primitive data to the given binary writer. Referenced objects are not serialized, but are added to the object graph.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void SerializeObject(PowerSerializationContext context, BinaryWriter writer, object obj, Type type)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializationContext.html">PowerSerializationContext</a></td>
+        <td><span class="parametername">context</span></td>
+        <td><p>The current serialization context, with data about the current object graph and known types.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.IO.BinaryWriter</span></td>
+        <td><span class="parametername">writer</span></td>
+        <td><p>The binary writer to utilize.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>The object that should be serialized.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type of the current object.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_WriteObjectReference_DouglasDwyer_PowerSerializer_PowerSerializationContext_System_IO_BinaryWriter_System_Object_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.WriteObjectReference(DouglasDwyer.PowerSerializer.PowerSerializationContext%2CSystem.IO.BinaryWriter%2CSystem.Object)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L252">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_WriteObjectReference_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.WriteObjectReference*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_WriteObjectReference_DouglasDwyer_PowerSerializer_PowerSerializationContext_System_IO_BinaryWriter_System_Object_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.WriteObjectReference(DouglasDwyer.PowerSerializer.PowerSerializationContext,System.IO.BinaryWriter,System.Object)">WriteObjectReference(PowerSerializationContext, BinaryWriter, Object)</h4>
+  <div class="markdown level1 summary"><p>Writes an object reference to the given binary writer. If the object has not been referenced before, its type is also stored, along with any immutable type data (like the contents of a string).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void WriteObjectReference(PowerSerializationContext context, BinaryWriter writer, object obj)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializationContext.html">PowerSerializationContext</a></td>
+        <td><span class="parametername">context</span></td>
+        <td><p>The current serialization context, with data about the current object graph and known types.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.IO.BinaryWriter</span></td>
+        <td><span class="parametername">writer</span></td>
+        <td><p>The binary writer to utilize.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>The object being referenced.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer_WritePrimitiveObject_System_IO_BinaryWriter_System_Object_.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer.WritePrimitiveObject(System.IO.BinaryWriter%2CSystem.Object)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L508">View Source</a>
+  </span>
+  <a id="DouglasDwyer_PowerSerializer_PowerSerializer_WritePrimitiveObject_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.WritePrimitiveObject*"></a>
+  <h4 id="DouglasDwyer_PowerSerializer_PowerSerializer_WritePrimitiveObject_System_IO_BinaryWriter_System_Object_" data-uid="DouglasDwyer.PowerSerializer.PowerSerializer.WritePrimitiveObject(System.IO.BinaryWriter,System.Object)">WritePrimitiveObject(BinaryWriter, Object)</h4>
+  <div class="markdown level1 summary"><p>Writes the value of a primitive object to the writer.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void WritePrimitiveObject(BinaryWriter writer, object primitive)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.IO.BinaryWriter</span></td>
+        <td><span class="parametername">writer</span></td>
+        <td><p>The binary writer to utilize.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">primitive</span></td>
+        <td><p>The object to write.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.ICloneable</span>
+  </div>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/DouglasDwyer/PowerSerializer/new/main/apiSpec/new?filename=DouglasDwyer_PowerSerializer_PowerSerializer.md&amp;value=---%0Auid%3A%20DouglasDwyer.PowerSerializer.PowerSerializer%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="https://github.com/DouglasDwyer/PowerSerializer/blob/main/PowerSerializer.cs/#L13" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

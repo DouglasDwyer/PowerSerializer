@@ -1,0 +1,210 @@
+{
+  "homepages": [],
+  "source_base_path": "D:/Projects/PowerSerializer/docfx_project",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.html",
+          "hash": "hUwob+KveVgY43yupeZ14g=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html",
+          "hash": "TIxXx5Fs+a3z/LTw45d+bw=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.FullGuidTypeResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.FullGuidTypeResolver.html",
+          "hash": "Uh+JjO4CFNKobhJTpGVh4w=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.GuidTypeResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.GuidTypeResolver.html",
+          "hash": "RTQbBm6rhgI1vpgGol9mGA=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.ITypeResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.ITypeResolver.html",
+          "hash": "Gtd1bor+BB/Mpq2mY7AsYA=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.PowerDeserializationContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.PowerDeserializationContext.html",
+          "hash": "drKFDISp1ohFWSFI+XM4oA=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.PowerSerializationContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.PowerSerializationContext.html",
+          "hash": "cvrvHR+McU24aKNVuTlp0A=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.PowerSerializer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.PowerSerializer.html",
+          "hash": "JIg1rcBqws7VJVQW0mDghw=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.html",
+          "hash": "cZWWqJERhvEi1QkgveqnEQ=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html",
+          "hash": "nYxeVifXvH+RaaGsWOjZug=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html",
+          "hash": "OjEjQUk+Arw2qFWj+qeHrg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "1hn+sqE6LTNjh6QVWx036Q=="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html",
+          "hash": "n9XKv2QGWaNAhz1RYQOwow=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": true,
+        "incrementalPhase": "build",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {
+        "ConceptualDocumentProcessor": {
+          "can_incremental": true,
+          "incrementalPhase": "build",
+          "total_file_count": 2,
+          "skipped_file_count": 1
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": true,
+          "incrementalPhase": "build",
+          "total_file_count": 9,
+          "skipped_file_count": 9
+        },
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": true,
+        "details": "Can support incremental post processing.",
+        "incrementalPhase": "postProcessing",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

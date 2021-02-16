@@ -1,9 +1,9 @@
-D:\Projects\PowerSerializer\PowerSerializer\bin\Debug\netstandard2.0\PowerSerializer.deps.json
-D:\Projects\PowerSerializer\PowerSerializer\bin\Debug\netstandard2.0\PowerSerializer.dll
-D:\Projects\PowerSerializer\PowerSerializer\bin\Debug\netstandard2.0\PowerSerializer.pdb
-D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\PowerSerializer.csprojAssemblyReference.cache
 D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\PowerSerializer.AssemblyInfoInputs.cache
 D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\PowerSerializer.AssemblyInfo.cs
 D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\PowerSerializer.csproj.CoreCompileInputs.cache
-D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\PowerSerializer.dll
-D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\PowerSerializer.pdb
+D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\PowerSerializer.csprojAssemblyReference.cache
+D:\Projects\PowerSerializer\PowerSerializer\bin\Debug\netstandard2.0\DouglasDwyer.PowerSerializer.deps.json
+D:\Projects\PowerSerializer\PowerSerializer\bin\Debug\netstandard2.0\DouglasDwyer.PowerSerializer.dll
+D:\Projects\PowerSerializer\PowerSerializer\bin\Debug\netstandard2.0\DouglasDwyer.PowerSerializer.pdb
+D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\DouglasDwyer.PowerSerializer.dll
+D:\Projects\PowerSerializer\PowerSerializer\obj\Debug\netstandard2.0\DouglasDwyer.PowerSerializer.pdb

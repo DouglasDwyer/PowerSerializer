@@ -5,64 +5,74 @@ using System.Linq;
 
 namespace DouglasDwyer.PowerSerializer
 {
-    public sealed class PowerSerializationContext
+    /// <summary>
+    /// Stores data about a <see cref="PowerSerializer"/>'s serialization operation, including a list of serialized types as well as the current object graph. This class, along with <see cref="PowerSerializer.CreateSerializationContext"/>, may be overriden to store additional information.
+    /// </summary>
+    public class PowerSerializationContext
     {
+        /// <summary>
+        /// A list the currently-known heap-based objects being serialized. This list is updated as additional objects are serialized. It does not contain value types that exist as part of a reference type's data; structs will only appear in this list if they are boxed as objects.
+        /// </summary>
+        public IList<object> ObjectGraph => SerializedObjects;
+        /// <summary>
+        /// A list of the currently-known types included in serialization. This list is updated as additional objects are serialized. It does not contain value types that exist as part of a reference type's data; struct types will only appear in this list if their instances are boxed as objects.
+        /// </summary>
+        public ImmutableList<Type> IncludedTypes => SerializedTypes.Keys.ToImmutableList();
+
         private Dictionary<Type, ushort> SerializedTypes = new Dictionary<Type, ushort>();
-        private Dictionary<object, SerializedObjectData> SerializedObjects = new Dictionary<object, SerializedObjectData>();
+        private Dictionary<object, ushort> SerializedObjectIDs = new Dictionary<object, ushort>();
+        private List<object> SerializedObjects = new List<object>() { null };
 
-        public Type RegisterObject(Type type, object obj)
-        {
-            SerializedObjects[obj] = new SerializedObjectData((ushort)(1 + SerializedObjects.Count), obj, type);
-            return type;
-        }
+        /// <summary>
+        /// Creates a serialization context for a new serialization operation.
+        /// </summary>
+        public PowerSerializationContext() { }
 
-        public ushort GetIDForType(Type type)
-        {
-            return SerializedTypes[type];
-        }
-
-        public SerializedObjectData GetDataForObject(object obj)
-        {
-            return SerializedObjects[obj];
-        }
-
+        /// <summary>
+        /// Returns whether the given object is already registered in the object graph.
+        /// </summary>
+        /// <param name="obj">The object to check.</param>
+        /// <returns>Whether the object is already in the serialization object graph.</returns>
         public bool HasObject(object obj)
         {
-            return SerializedObjects.ContainsKey(obj);
+            return obj != null && SerializedObjectIDs.ContainsKey(obj);
         }
 
-        public ImmutableList<Type> GetSerializedTypes()
+        /// <summary>
+        /// Returns the reference ID of the given object, or throws an exception if the object isn't registered in the object graph.
+        /// </summary>
+        /// <param name="obj">The object to examine.</param>
+        /// <returns>The ID of the object.</returns>
+        public ushort GetObjectID(object obj)
         {
-            return SerializedTypes.OrderBy(x => x.Value).Select(x => x.Key).ToImmutableList();
+            return SerializedObjectIDs[obj];
         }
 
-        public ImmutableList<SerializedObjectData> GetSerializationData()
+        /// <summary>
+        /// Registers an object in the object graph and adds its type to the list of known types, returning the object's type and assigned ID.
+        /// </summary>
+        /// <param name="obj">The object to register.</param>
+        /// <returns>A tuple containing the ID of the object and the type of the object.</returns>
+        public (ushort id, Type type) RegisterObject(object obj)
         {
-            return SerializedObjects.Values.OrderBy(x => x.ID).ToImmutableList();
-        }
-
-        public bool AddType(Type type)
-        {
-            if (!SerializedTypes.ContainsKey(type))
+            Type type = obj.GetType();
+            if(!SerializedTypes.ContainsKey(type))
             {
-                SerializedTypes.Add(type, (ushort)SerializedTypes.Count);
-                return true;
+                SerializedTypes[type] = (ushort)SerializedTypes.Count;
             }
-            return false;
+            ushort toReturn = SerializedObjectIDs[obj] = (ushort)SerializedObjects.Count;
+            SerializedObjects.Add(obj);
+            return (toReturn, type);
         }
 
-        public struct SerializedObjectData
+        /// <summary>
+        /// Gets the ID for a given type, or throws an exception if the type isn't registered in the known types list.
+        /// </summary>
+        /// <param name="type">The type to examine.</param>
+        /// <returns>The ID of the type.</returns>
+        public ushort GetTypeID(Type type)
         {
-            public ushort ID { get; }
-            public object Value { get; }
-            public Type ObjectType { get; }
-
-            public SerializedObjectData(ushort id, object obj, Type objectType)
-            {
-                ID = id;
-                Value = obj;
-                ObjectType = objectType;
-            }
+            return SerializedTypes[type];
         }
     }
 }

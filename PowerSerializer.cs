@@ -2,121 +2,210 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Text;
-using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Security.Cryptography;
-using DotNetCross.Memory;
 using System.Runtime.Serialization;
 
 namespace DouglasDwyer.PowerSerializer
 {
-    public class PowerSerializer
+    /// <summary>
+    /// Allows for customizable binary serialization and deserialization of complex types. Instances of <see cref="PowerSerializer"/> can serialize absolutely anything, provided that their type resolver allows it.
+    /// </summary>
+    public class PowerSerializer : ICloneable
     {
-        private MD5 TypeHasher = MD5.Create();
-        private Dictionary<Type, Guid> IDTypeBinding = new Dictionary<Type, Guid>();
-        private Dictionary<Guid, Type> TypeIDBinding = new Dictionary<Guid, Type>();
+        /// <summary>
+        /// The resolver used to identify/verify serialized types.
+        /// </summary>
+        public ITypeResolver TypeResolver { get; }
 
-        private static MethodInfo MutateBoxedTypeGenericInfo = typeof(PowerSerializer).GetMethod("MutateValueType", BindingFlags.NonPublic | BindingFlags.Static);
+        /// <summary>
+        /// Creates a new serializer instance with a <see cref="FinalizerLimitedTypeResolver"/> limited to types without finalizers.
+        /// </summary>
+        public PowerSerializer() : this(new FinalizerLimitedTypeResolver()) { }
 
-        public PowerSerializer()
+        /// <summary>
+        /// Creates a new serializer instance with the specified type resolver.
+        /// </summary>
+        /// <param name="resolver">The type resolver that should be used during serialization/deseriation for identifing/verifying types.</param>
+        public PowerSerializer(ITypeResolver resolver)
         {
-            TypeIDBinding = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).ToDictionary(x => new Guid(TypeHasher.ComputeHash(Encoding.ASCII.GetBytes(x.AssemblyQualifiedName))));
-            IDTypeBinding = TypeIDBinding.ToDictionary(x => x.Value, x => x.Key);
+            TypeResolver = resolver;
         }
 
+        /// <summary>
+        /// Serializes an object to a byte array.
+        /// </summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <returns>A byte-based representation of the object.</returns>
         public virtual byte[] Serialize(object obj)
         {
+            if(obj is null)
+            {
+                obj = new NullRepresentative();
+            }
+
             using(MemoryStream stream = new MemoryStream())
             {
                 using(BinaryWriter writer = new BinaryWriter(stream))
                 {
-                    PowerSerializationContext context = new PowerSerializationContext();
-                    LoadObjectGraph(context, writer, obj, true);
-                    ImmutableList<Type> types = context.GetSerializedTypes();
-                    writer.Write((ushort)types.Count);
-                    foreach (Type type in types)
+                    PowerSerializationContext context = CreateSerializationContext();
+                    Type objType = context.RegisterObject(obj).Item2;
+                    CheckTypeAllowance(objType);
+                    if (objType == typeof(string))
                     {
-                        WriteType(writer, type);
+                        writer.Write((string)obj);
+                        long pos = writer.BaseStream.Position;
+                        TypeResolver.WriteTypeID(writer, objType);
+                        writer.Write((int)(writer.BaseStream.Position - pos));
                     }
-                    ImmutableList<PowerSerializationContext.SerializedObjectData> data = context.GetSerializationData();
-                    writer.Write((ushort)data.Count);
-                    foreach (PowerSerializationContext.SerializedObjectData objData in data)
+                    else if(objType.IsPrimitive)
                     {
-                        WriteCreationData(context, writer, objData);
+                        WritePrimitiveObject(writer, obj);
+                        long pos = writer.BaseStream.Position;
+                        TypeResolver.WriteTypeID(writer, objType);
+                        writer.Write((int)(writer.BaseStream.Position - pos));
                     }
-                    foreach (PowerSerializationContext.SerializedObjectData objData in data)
+                    else
                     {
-                        WriteInitializationData(context, writer, objData.Value, objData.ObjectType);
+                        if (obj is Array array)
+                        {
+                            byte rankSize = (byte)array.Rank;
+                            writer.Write(rankSize);
+                            for (int i = 0; i < array.Rank; i++)
+                            {
+                                writer.Write(array.GetLength(i));
+                            }
+                        }
+                        for (int i = 1; i < context.ObjectGraph.Count; i++)
+                        {
+                            SerializeObject(context, writer, context.ObjectGraph[i], context.ObjectGraph[i].GetType());
+                        }
+                        ImmutableList<Type> types = context.IncludedTypes;
+                        long pos = writer.BaseStream.Position;
+                        foreach (Type type in types)
+                        {
+                            TypeResolver.WriteTypeID(writer, type);
+                        }
+                        writer.Write((int)(writer.BaseStream.Position - pos));
                     }
                     return stream.ToArray();
                 }
             }
         }
 
+        /// <summary>
+        /// Deserializes an object from a byte array.
+        /// </summary>
+        /// <param name="data">The byte-based representation of the object.</param>
+        /// <returns>The deserialized object.</returns>
         public virtual object Deserialize(byte[] data)
         {
             using (MemoryStream stream = new MemoryStream(data))
             {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
-                    Type[] knownTypes = new Type[reader.ReadUInt16()];
-                    for (int i = 0; i < knownTypes.Length; i++)
+                    PowerDeserializationContext context = CreateDeserializationContext();
+                    int dataLength = data.Length - 4;
+                    stream.Position = dataLength;
+                    int typeSize = reader.ReadInt32();
+                    stream.Position = data.Length - typeSize - 4;
+
+                    List<Type> knownTypes = new List<Type>();
+                    while (reader.BaseStream.Position < dataLength)
                     {
-                        knownTypes[i] = ReadType(reader);
+                        knownTypes.Add(TypeResolver.ReadTypeID(reader));
                     }
-                    Type[] typeList = new Type[reader.ReadUInt16() + 1];
-                    object[] objectGraph = new object[typeList.Length];
-                    for(int i = 1; i < objectGraph.Length; i++)
+                    stream.Position = 0;
+                    context.IncludedTypes = knownTypes;
+
+                    object obj = ReadAndCreateObject(context, reader, knownTypes[0]);
+                    if(obj is NullRepresentative)
                     {
-                        (object, Type) createdObject = ReadCreationData(reader, knownTypes);
-                        typeList[i] = createdObject.Item2;
-                        objectGraph[i] = createdObject.Item1;
+                        obj = null;
                     }
-                    for (int i = 1; i < objectGraph.Length; i++)
+                    for (int i = 1; i < context.ObjectGraph.Count; i++)
                     {
-                        ReadInitializationData(reader, objectGraph, typeList[i], objectGraph[i]);
+                        DeserializeObject(context, reader, context.ObjectGraph[i], context.ObjectGraph[i].GetType());
                     }
-                    return objectGraph[1];
+
+                    return ProcessObjectGraph(context);
                 }
             }
         }
 
+        /// <summary>
+        /// Deserializes an object from a byte array.
+        /// </summary>
+        /// <typeparam name="T">The type of the deserialized object.</typeparam>
+        /// <param name="data">The byte-based representation of the object.</param>
+        /// <returns>The deserialized object.</returns>
         public virtual T Deserialize<T>(byte[] data)
         {
             return (T)Deserialize(data);
         }
 
-        protected virtual void SerializeObject(PowerSerializationContext context, BinaryWriter writer, object obj)
+        /// <summary>
+        /// Creates a new serialization context for storing data about a serialization operation.
+        /// </summary>
+        /// <returns>The new serialization context.</returns>
+        protected virtual PowerSerializationContext CreateSerializationContext()
         {
-            Type type = obj.GetType();
-            context.AddType(type);
-            context.RegisterObject(type, obj);
+            return new PowerSerializationContext();
+        }
+
+        /// <summary>
+        /// Creates a new deserialization context for storing data about a deserialization operation.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual PowerDeserializationContext CreateDeserializationContext()
+        {
+            return new PowerDeserializationContext();
+        }
+
+        /// <summary>
+        /// Processes the generated object graph, makes any last-minute changes if necessary, and returns the deserialized object.
+        /// </summary>
+        /// <param name="context">The current deserialization context.</param>
+        /// <returns>The final deserialized object.</returns>
+        protected virtual object ProcessObjectGraph(PowerDeserializationContext context)
+        {
+            return context.ObjectGraph[1];
+        }
+
+        /// <summary>
+        /// Serializes the given object, writing its object references and primitive data to the given binary writer. Referenced objects are not serialized, but are added to the object graph.
+        /// </summary>
+        /// <param name="context">The current serialization context, with data about the current object graph and known types.</param>
+        /// <param name="writer">The binary writer to utilize.</param>
+        /// <param name="obj">The object that should be serialized.</param>
+        /// <param name="type">The type of the current object.</param>
+        protected virtual void SerializeObject(PowerSerializationContext context, BinaryWriter writer, object obj, Type type)
+        {
             if (type.IsArray)
             {
-                //array behavior
                 Array array = (Array)obj;
-                byte rankSize = (byte)array.Rank;
-                writer.Write(rankSize);
-                int[] ranks = new int[rankSize];
-                for(int i = 0; i < rankSize; i++)
+                int[] ranks = new int[array.Rank];
+                for(int i = 0; i < array.Rank; i++)
                 {
                     ranks[i] = array.GetLength(i);
                 }
                 Type elementType = type.GetElementType();
+                CheckTypeAllowance(type);
                 if (elementType.IsPrimitive)
                 {
-                    WriteFlattenedPrimitiveArray(context, writer, array, 0, ranks, new int[rankSize]);
+                    WriteFlattenedPrimitiveArray(context, writer, array, 0, ranks, new int[array.Rank]);
                 }
                 else if (elementType.IsValueType)
                 {
-                    WriteFlattenedValueTypeArray(context, writer, array, 0, ranks, new int[rankSize], elementType);
+                    WriteFlattenedValueTypeArray(context, writer, array, 0, ranks, new int[array.Rank], elementType);
                 }
                 else
                 {
-                    WriteFlattenedArray(context, writer, array, 0, ranks, new int[rankSize]);
+                    WriteFlattenedArray(context, writer, array, 0, ranks, new int[array.Rank]);
                 }
+            }
+            else if(type.IsPrimitive)
+            {
+                
             }
             else
             {
@@ -130,10 +219,12 @@ namespace DouglasDwyer.PowerSerializer
             {
                 if (info.FieldType.IsPrimitive)
                 {
+                    CheckTypeAllowance(info.FieldType);
                     WritePrimitiveObject(writer, info.GetValue(obj));
                 }
                 else if (info.FieldType.IsValueType)
                 {
+                    CheckTypeAllowance(info.FieldType);
                     SerializeReferenceType(context, writer, info.GetValue(obj), info.FieldType);
                 }
                 else
@@ -145,274 +236,174 @@ namespace DouglasDwyer.PowerSerializer
                     }
                     else
                     {
-                        if (context.HasObject(obj))
-                        {
-                            writer.Write(context.GetDataForObject(obj).ID);
-                        }
-                        else
-                        {
-                            writer.Write(ushort.MaxValue);
-                            SerializeObject(context, writer, value);
-                        }
+                        CheckTypeAllowance(value.GetType());
+                        WriteObjectReference(context, writer, value);
                     }
                 }
             }
         }
 
-        protected virtual void LoadObjectGraph(PowerSerializationContext context, BinaryWriter writer, object obj, bool referenced)
+        /// <summary>
+        /// Writes an object reference to the given binary writer. If the object has not been referenced before, its type is also stored, along with any immutable type data (like the contents of a string).
+        /// </summary>
+        /// <param name="context">The current serialization context, with data about the current object graph and known types.</param>
+        /// <param name="writer">The binary writer to utilize.</param>
+        /// <param name="obj">The object being referenced.</param>
+        protected virtual void WriteObjectReference(PowerSerializationContext context, BinaryWriter writer, object obj)
         {
-            Type type = obj.GetType();
-            if (referenced)
+            if(obj is null)
             {
-                context.AddType(type);
-                context.RegisterObject(type, obj);
+                writer.Write((ushort)0);
             }
-            if (type.IsArray)
+            else if (context.HasObject(obj))
             {
-                Type elementType = type.GetElementType();
-                if(elementType.IsPrimitive) { }
-                if(type.GetElementType().IsValueType) {
-                    foreach (object value in (Array)obj)
-                    {
-                        if (value != null && !context.HasObject(value))
-                        {
-                            LoadObjectGraph(context, writer, value, false);
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (object value in (Array)obj)
-                    {
-                        if (value != null && !context.HasObject(value))
-                        {
-                            LoadObjectGraph(context, writer, value, true);
-                        }
-                    }
-                }
+                writer.Write(context.GetObjectID(obj));
             }
             else
             {
-                foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                (ushort, Type) objectData = context.RegisterObject(obj);
+                writer.Write(objectData.Item1);
+                writer.Write(context.GetTypeID(objectData.Item2));
+                if(obj is string oString)
                 {
-                    if (!info.FieldType.IsPrimitive)
-                    {
-                        object value = info.GetValue(obj);
-                        if (value != null && !context.HasObject(value))
-                        {
-                            LoadObjectGraph(context, writer, value, !info.FieldType.IsValueType);
-                        }
-                    }
+                    writer.Write(oString);
                 }
-            }
-        }
-
-        protected virtual void WriteCreationData(PowerSerializationContext context, BinaryWriter writer, PowerSerializationContext.SerializedObjectData data)
-        {
-            writer.Write(context.GetIDForType(data.ObjectType));
-            if (data.ObjectType == typeof(string))
-            {
-                writer.Write((string)data.Value);
-            }
-            else if(data.ObjectType.IsArray)
-            {
-                Array array = (Array)data.Value;
-                byte rankCount = (byte)array.Rank;
-                writer.Write(rankCount);
-                for (int i = 0; i < rankCount; i++)
-                {
-                    writer.Write(array.GetLength(i));
-                }
-            }
-        }
-
-        protected virtual void WriteInitializationData(PowerSerializationContext context, BinaryWriter writer, object obj, Type type)
-        {
-            if (type != typeof(string))
-            {
-                if (type.IsArray)
-                {
-                    Array array = (Array)obj;
-                    byte rankCount = (byte)array.Rank;
-                    int[] ranks = new int[rankCount];
-                    for (int i = 0; i < rankCount; i++)
-                    {
-                        ranks[i] = array.GetLength(i);
-                    }
-                    Type elementType = type.GetElementType();
-                    if (elementType.IsPrimitive)
-                    {
-                        WriteFlattenedPrimitiveArray(context, writer, array, 0, ranks, new int[rankCount]);
-                    }
-                    else if (elementType.IsValueType)
-                    {
-                        WriteFlattenedValueTypeArray(context, writer, array, 0, ranks, new int[rankCount], elementType);
-                    }
-                    else
-                    {
-                        WriteFlattenedArray(context, writer, array, 0, ranks, new int[rankCount]);
-                    }
-                }
-                else if (type.IsPrimitive)
+                else if(objectData.Item2.IsPrimitive)
                 {
                     WritePrimitiveObject(writer, obj);
                 }
-                else
+                else if(obj is Array array)
                 {
-                    WriteReferenceTypeInitializationData(context, writer, obj, type);
-                }
-            }
-        }
-
-        private void WriteReferenceTypeInitializationData(PowerSerializationContext context, BinaryWriter writer, object obj, Type type)
-        {
-            foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-            {
-                object fieldValue = info.GetValue(obj);
-                if (info.FieldType.IsValueType)
-                {
-                    WriteInitializationData(context, writer, fieldValue, info.FieldType);
-                }
-                else
-                {
-                    if (fieldValue is null)
+                    byte rankSize = (byte)array.Rank;
+                    writer.Write(rankSize);
+                    for (int i = 0; i < array.Rank; i++)
                     {
-                        writer.Write((ushort)0);
-                    }
-                    else
-                    {
-                        writer.Write(context.GetDataForObject(fieldValue).ID);
+                        writer.Write(array.GetLength(i));
                     }
                 }
             }
         }
 
-        protected virtual (object created, Type creationType) ReadCreationData(BinaryReader reader, Type[] types)
+        /// <summary>
+        /// Deserializes the given object, populating its fields by reading its object references and primitive data from the given binary reader.
+        /// </summary>
+        /// <param name="context">The current deserialization context, with data about the current object graph and known types.</param>
+        /// <param name="reader">The binary reader to utilize.</param>
+        /// <param name="obj">The object whose fields should be populated.</param>
+        /// <param name="type">The type of the deserialized object.</param>
+        protected virtual void DeserializeObject(PowerDeserializationContext context, BinaryReader reader, object obj, Type type)
         {
-            int v;
-            Type type = types[v = reader.ReadUInt16()];
-            if (type == typeof(string))
+            if (type.IsArray)
             {
-                return (reader.ReadString(), type);
-            }
-            else if(type.IsArray)
-            {
-                byte rankCount = reader.ReadByte();
-                int[] ranks = new int[rankCount];
-                for(int i = 0; i < ranks.Length; i++)
+                Array array = (Array)obj;
+                int[] ranks = new int[array.Rank];
+                for (int i = 0; i < array.Rank; i++)
                 {
-                    ranks[i] = reader.ReadInt32();
+                    ranks[i] = array.GetLength(i);
                 }
-                return (Array.CreateInstance(type.GetElementType(), ranks), type);
+                Type elementType = type.GetElementType();
+                CheckTypeAllowance(elementType);
+                if (elementType.IsPrimitive)
+                {
+                    ReadFlattenedPrimitiveArray(reader, array, 0, ranks, new int[array.Rank], elementType);
+                }
+                else if (elementType.IsValueType)
+                {
+                    ReadFlattenedValueTypeArray(context, reader, array, 0, ranks, new int[array.Rank], elementType);
+                }
+                else
+                {
+                    ReadFlattenedArray(context, reader, array, 0, ranks, new int[array.Rank]);
+                }
             }
+            else if(type.IsPrimitive) { }
             else
             {
-                return (FormatterServices.GetUninitializedObject(type), type);
+                DeserializeReferenceType(context, reader, obj, type);
             }
         }
 
-        protected virtual void ReadInitializationData(BinaryReader reader, object[] objectGraph, Type type, object obj)
-        {
-            if(type != typeof(string))
-            {
-                if (type.IsArray)
-                {
-                    Array array = (Array)obj;
-                    byte rankCount = (byte)array.Rank;
-                    int[] ranks = new int[rankCount];
-                    for (int i = 0; i < rankCount; i++)
-                    {
-                        ranks[i] = array.GetLength(i);
-                    }
-                    Type elementType = type.GetElementType();
-                    if (elementType.IsPrimitive)
-                    {
-                        ReadFlattenedPrimitiveArray(reader, array, 0, ranks, new int[rankCount], elementType);
-                    }
-                    else if (elementType.IsValueType)
-                    {
-                        ReadFlattenedValueTypeArray(reader, objectGraph, array, 0, ranks, new int[rankCount], elementType);
-                    }
-                    else
-                    {
-                        ReadFlattenedArray(reader, objectGraph, array, 0, ranks, new int[rankCount]);
-                    }
-                }
-                else if (type.IsPrimitive)
-                {
-                    MutateBoxedType(obj, ReadPrimitiveObject(reader, type), type);
-                }
-                else
-                {
-                    ReadReferenceTypeInitializationData(reader, objectGraph, obj, type);
-                }
-            }
-        }
-
-        private void ReadReferenceTypeInitializationData(BinaryReader reader, object[] objectGraph, object obj, Type type)
+        private void DeserializeReferenceType(PowerDeserializationContext context, BinaryReader reader, object obj, Type type)
         {
             foreach (FieldInfo info in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
-                if(info.FieldType.IsPrimitive)
+                if (info.FieldType.IsPrimitive)
                 {
+                    CheckTypeAllowance(info.FieldType);
                     info.SetValue(obj, ReadPrimitiveObject(reader, info.FieldType));
                 }
                 else if (info.FieldType.IsValueType)
                 {
-                    object fieldValue = FormatterServices.GetUninitializedObject(info.FieldType);
-                    ReadInitializationData(reader, objectGraph, info.FieldType, fieldValue);
-                    info.SetValue(obj, fieldValue);
+                    CheckTypeAllowance(info.FieldType);
+                    object field = FormatterServices.GetUninitializedObject(info.FieldType);
+                    DeserializeReferenceType(context, reader, field, info.FieldType);
+                    info.SetValue(obj, field);
                 }
                 else
                 {
-                    info.SetValue(obj, objectGraph[reader.ReadUInt16()]);
+                    info.SetValue(obj, ReadObjectReference(context, reader));
                 }
             }
         }
 
-        protected virtual void WriteType(BinaryWriter writer, Type type)
+        /// <summary>
+        /// Reads an object reference from the given binary reader. If the object has not been referenced before, a new object of the specified type is instantiated.
+        /// </summary>
+        /// <param name="context">The current deserialization context, with data about the current object graph and known types.</param>
+        /// <param name="reader">The binary reader to utilize.</param>
+        /// <returns>The referenced object.</returns>
+        protected virtual object ReadObjectReference(PowerDeserializationContext context, BinaryReader reader)
         {
-            if(type.IsArray)
+            ushort id = reader.ReadUInt16();
+            if(id == 0)
             {
-                WriteType(writer, typeof(SerializedArray<>).MakeGenericType(new[] { type.GetElementType() }));
+                return null;
             }
-            else if(type.IsGenericType)
+            else if (context.HasObject(id))
             {
-                writer.Write(IDTypeBinding[type.GetGenericTypeDefinition()].ToByteArray());
-                foreach(Type arg in type.GenericTypeArguments)
-                {
-                    WriteType(writer, arg);
-                }
+                return context.GetObject(id);
             }
             else
             {
-                writer.Write(IDTypeBinding[type].ToByteArray());
+                return ReadAndCreateObject(context, reader, context.GetTypeFromID(reader.ReadUInt16()));
             }
         }
 
-        protected virtual Type ReadType(BinaryReader reader)
+        /// <summary>
+        /// Reads an object's data from the specified binary reader and creates a new instance of that object with the given data. For user-defined types, a new object of the specified type is returned without any fields initialized. For arrays, a new object with the correct rank lengths is returned. For strings and primitives, an object with the correct value is returned.
+        /// </summary>
+        /// <param name="context">The current deserialization context, with data about the current object graph and known types.</param>
+        /// <param name="reader">The binary reader to utilize.</param>
+        /// <param name="type">The type of the object to create.</param>
+        /// <returns>The created object.</returns>
+        protected virtual object ReadAndCreateObject(PowerDeserializationContext context, BinaryReader reader, Type type)
         {
-            Type baseType = TypeIDBinding[new Guid(reader.ReadBytes(16))];
-            if(baseType.IsGenericType)
+            CheckTypeAllowance(type);
+            object toReturn;
+            if (type == typeof(string))
             {
-                Type[] typeArguments = new Type[baseType.GetGenericArguments().Length];
-                for(int i = 0; i < typeArguments.Length; i++)
+                toReturn = reader.ReadString();
+            }
+            else if (type.IsPrimitive)
+            {
+                toReturn = ReadPrimitiveObject(reader, type);
+            }
+            else if (type.IsArray)
+            {
+                byte rankSize = reader.ReadByte();
+                int[] ranks = new int[rankSize];
+                for (int i = 0; i < rankSize; i++)
                 {
-                    typeArguments[i] = ReadType(reader);
+                    ranks[i] = reader.ReadInt32();
                 }
-                if (baseType == typeof(SerializedArray<>))
-                {
-                    return typeArguments[0].MakeArrayType();
-                }
-                else
-                {
-                    return baseType.MakeGenericType(typeArguments);
-                }
+                toReturn = Array.CreateInstance(type.GetElementType(), ranks);
             }
             else
             {
-                return baseType;
+                toReturn = FormatterServices.GetUninitializedObject(type);
             }
+            context.RegisterNextObject(toReturn);
+            return toReturn;
         }
 
         private void WriteFlattenedArray(PowerSerializationContext context, BinaryWriter writer, Array array, int index, int[] ranks, int[] currentRanks)
@@ -427,15 +418,7 @@ namespace DouglasDwyer.PowerSerializer
             }
             else
             {
-                object value = array.GetValue(currentRanks);
-                if (value is null)
-                {
-                    writer.Write((ushort)0);
-                }
-                else
-                {
-                    writer.Write(context.GetDataForObject(value).ID);
-                }
+                WriteObjectReference(context, writer, array.GetValue(currentRanks));
             }
         }
 
@@ -451,7 +434,7 @@ namespace DouglasDwyer.PowerSerializer
             }
             else
             {
-                WriteInitializationData(context, writer, array.GetValue(currentRanks), type);
+                SerializeReferenceType(context, writer, array.GetValue(currentRanks), type);
             }
         }
 
@@ -471,36 +454,36 @@ namespace DouglasDwyer.PowerSerializer
             }
         }
 
-        private void ReadFlattenedArray(BinaryReader reader, object[] objectGraph, Array array, int index, int[] ranks, int[] currentRanks)
+        private void ReadFlattenedArray(PowerDeserializationContext context, BinaryReader reader, Array array, int index, int[] ranks, int[] currentRanks)
         {
             if (index < ranks.Length)
             {
                 for (int i = 0; i < ranks[index]; i++)
                 {
-                    ReadFlattenedArray(reader, objectGraph, array, index + 1, ranks, currentRanks);
+                    ReadFlattenedArray(context, reader, array, index + 1, ranks, currentRanks);
                     currentRanks[index]++;
                 }
             }
             else
             {
-                array.SetValue(objectGraph[reader.ReadUInt16()], currentRanks);
+                array.SetValue(ReadObjectReference(context, reader), currentRanks);
             }
         }
 
-        private void ReadFlattenedValueTypeArray(BinaryReader reader, object[] objectGraph, Array array, int index, int[] ranks, int[] currentRanks, Type type)
+        private void ReadFlattenedValueTypeArray(PowerDeserializationContext context, BinaryReader reader, Array array, int index, int[] ranks, int[] currentRanks, Type type)
         {
             if (index < ranks.Length)
             {
                 for (int i = 0; i < ranks[index]; i++)
                 {
-                    ReadFlattenedValueTypeArray(reader, objectGraph, array, index + 1, ranks, currentRanks, type);
+                    ReadFlattenedValueTypeArray(context, reader, array, index + 1, ranks, currentRanks, type);
                     currentRanks[index]++;
                 }
             }
             else
             {
                 object obj = FormatterServices.GetUninitializedObject(type);
-                ReadInitializationData(reader, objectGraph, type, obj);
+                DeserializeReferenceType(context, reader, obj, type);
                 array.SetValue(obj, currentRanks);
             }
         }
@@ -521,7 +504,12 @@ namespace DouglasDwyer.PowerSerializer
             }
         }
 
-        private void WritePrimitiveObject(BinaryWriter writer, object primitive)
+        /// <summary>
+        /// Writes the value of a primitive object to the writer.
+        /// </summary>
+        /// <param name="writer">The binary writer to utilize.</param>
+        /// <param name="primitive">The object to write.</param>
+        protected virtual void WritePrimitiveObject(BinaryWriter writer, object primitive)
         {
             if (primitive is byte pByte)
             {
@@ -589,11 +577,17 @@ namespace DouglasDwyer.PowerSerializer
             }
         }
 
-        private object ReadPrimitiveObject(BinaryReader reader, Type type)
+        /// <summary>
+        /// Reads the value of a primitive object from the reader.
+        /// </summary>
+        /// <param name="reader">The binary reader to utilize.</param>
+        /// <param name="type">The type of the primitive to read.</param>
+        /// <returns>The primitive value.</returns>
+        protected virtual object ReadPrimitiveObject(BinaryReader reader, Type type)
         {
             if (type == typeof(byte))
             {
-                return reader.Read();
+                return reader.ReadByte();
             }
             else if (type == typeof(short))
             {
@@ -671,17 +665,25 @@ namespace DouglasDwyer.PowerSerializer
             }
         }
 
-        private static void MutateBoxedType(object obj, object replacement, Type type)
+        /// <summary>
+        /// Checks whether serialization of a type is allowed under the current type resovler, and throws an exception if serialization is forbidden.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        protected virtual void CheckTypeAllowance(Type type)
         {
-            MutateBoxedTypeGenericInfo.MakeGenericMethod(new[] { type }).Invoke(null, new[] { obj, replacement });
+            if (!TypeResolver.IsTypeSerializable(type))
+            {
+                throw new SerializationException("The current type resolver does not allow for serialization/deserialization of " + type + ".");
+            }
         }
 
-        private static void MutateValueType<T>(object obj, T replacement) where T : struct
+        /// <summary>
+        /// Creates a memberwise copy of this object, returning a <see cref="PowerSerializer"/> with the same settings as the original.
+        /// </summary>
+        /// <returns></returns>
+        public virtual object Clone()
         {
-            ref T value = ref Unsafe.Unbox<T>(obj);
-            value = replacement;
+            return MemberwiseClone();
         }
-
-        private class SerializedArray<T> { }
     }
 }

@@ -7,22 +7,13 @@
   "targets": {
     ".NETStandard,Version=v2.0": {},
     ".NETStandard,Version=v2.0/": {
-      "PowerSerializer/1.0.0": {
+      "DouglasDwyer.PowerSerializer/1.0.0": {
         "dependencies": {
-          "DotNetCross.Memory.Unsafe": "0.3.1",
           "NETStandard.Library": "2.0.3",
           "System.Collections.Immutable": "5.0.0"
         },
         "runtime": {
-          "PowerSerializer.dll": {}
-        }
-      },
-      "DotNetCross.Memory.Unsafe/0.3.1": {
-        "runtime": {
-          "lib/netstandard2.0/DotNetCross.Memory.Unsafe.dll": {
-            "assemblyVersion": "0.3.0.0",
-            "fileVersion": "0.0.0.0"
-          }
+          "DouglasDwyer.PowerSerializer.dll": {}
         }
       },
       "Microsoft.NETCore.Platforms/1.1.0": {},
@@ -82,17 +73,10 @@
     }
   },
   "libraries": {
-    "PowerSerializer/1.0.0": {
+    "DouglasDwyer.PowerSerializer/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
-    },
-    "DotNetCross.Memory.Unsafe/0.3.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-6C1bkaPgSCV8aAcqeFOh7YQGCWgjXIEfKvfr42CAgwhVLG3bsnpym7LoKxLPtTfpjp+76FldaNE3jnVdqn34sA==",
-      "path": "dotnetcross.memory.unsafe/0.3.1",
-      "hashPath": "dotnetcross.memory.unsafe.0.3.1.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/1.1.0": {
       "type": "package",

@@ -2,15 +2,6 @@
   "version": 3,
   "targets": {
     ".NETStandard,Version=v2.0": {
-      "DotNetCross.Memory.Unsafe/0.3.1": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/DotNetCross.Memory.Unsafe.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/DotNetCross.Memory.Unsafe.dll": {}
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -91,21 +82,6 @@
     }
   },
   "libraries": {
-    "DotNetCross.Memory.Unsafe/0.3.1": {
-      "sha512": "6C1bkaPgSCV8aAcqeFOh7YQGCWgjXIEfKvfr42CAgwhVLG3bsnpym7LoKxLPtTfpjp+76FldaNE3jnVdqn34sA==",
-      "type": "package",
-      "path": "dotnetcross.memory.unsafe/0.3.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "dotnetcross.memory.unsafe.0.3.1.nupkg.sha512",
-        "dotnetcross.memory.unsafe.nuspec",
-        "lib/net45/DotNetCross.Memory.Unsafe.dll",
-        "lib/netcoreapp2.0/DotNetCross.Memory.Unsafe.dll",
-        "lib/netstandard1.0/DotNetCross.Memory.Unsafe.dll",
-        "lib/netstandard2.0/DotNetCross.Memory.Unsafe.dll"
-      ]
-    },
     "Microsoft.NETCore.Platforms/1.1.0": {
       "sha512": "kz0PEW2lhqygehI/d6XsPCQzD7ff7gUJaVGPVETX611eadGsA3A877GdSlU0LRVMCTH/+P3o2iDTak+S08V2+A==",
       "type": "package",
@@ -405,7 +381,6 @@
   },
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
-      "DotNetCross.Memory.Unsafe >= 0.3.1",
       "NETStandard.Library >= 2.0.3",
       "System.Collections.Immutable >= 5.0.0"
     ]
@@ -418,7 +393,7 @@
     "version": "1.0.0",
     "restore": {
       "projectUniqueName": "D:\\Projects\\PowerSerializer\\PowerSerializer\\PowerSerializer.csproj",
-      "projectName": "PowerSerializer",
+      "projectName": "DouglasDwyer.PowerSerializer",
       "projectPath": "D:\\Projects\\PowerSerializer\\PowerSerializer\\PowerSerializer.csproj",
       "packagesPath": "C:\\Users\\Douglas\\.nuget\\packages\\",
       "outputPath": "D:\\Projects\\PowerSerializer\\PowerSerializer\\obj\\",
@@ -456,10 +431,6 @@
       "netstandard2.0": {
         "targetAlias": "netstandard2.0",
         "dependencies": {
-          "DotNetCross.Memory.Unsafe": {
-            "target": "Package",
-            "version": "[0.3.1, )"
-          },
           "NETStandard.Library": {
             "suppressParent": "All",
             "target": "Package",

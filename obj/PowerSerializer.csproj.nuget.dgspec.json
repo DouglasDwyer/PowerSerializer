@@ -8,7 +8,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\Projects\\PowerSerializer\\PowerSerializer\\PowerSerializer.csproj",
-        "projectName": "PowerSerializer",
+        "projectName": "DouglasDwyer.PowerSerializer",
         "projectPath": "D:\\Projects\\PowerSerializer\\PowerSerializer\\PowerSerializer.csproj",
         "packagesPath": "C:\\Users\\Douglas\\.nuget\\packages\\",
         "outputPath": "D:\\Projects\\PowerSerializer\\PowerSerializer\\obj\\",
@@ -46,10 +46,6 @@
         "netstandard2.0": {
           "targetAlias": "netstandard2.0",
           "dependencies": {
-            "DotNetCross.Memory.Unsafe": {
-              "target": "Package",
-              "version": "[0.3.1, )"
-            },
             "NETStandard.Library": {
               "suppressParent": "All",
               "target": "Package",

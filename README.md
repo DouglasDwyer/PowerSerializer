@@ -28,6 +28,10 @@ PowerSerializer is an object-oriented, reference-based binary serializer. Upon s
 
 Types do not need any specific designation/attribute to be serializable. However, the `ITypeResolver` associated with the serializer instance must allow for serialization of a given type in order for it to be serialized.
 
+#### Binary format
+
+PowerSerializer stores objects as bit-based structs without field names. Each serialized object looks much like it would in-memory - struct types are written directly as a fixed number of bytes, and references to reference types are written as 16-bit unsigned pointers. This means that struct/class layouts must match **exactly** during serialization and deserialization, or deserialization will fail. This makes PowerSerializer most useful for short-term applications where object layouts shouldn't change. If cross-platform or cross-assembly compatability is important, however, PowerSerializer may be modified to store field names. A builtin PowerSerializer subclass with this functionality is planned in the future.
+
 #### Security
 
 Serialization can be a dangerous affair, especially with a library as far-reaching/nonrestrictive as PowerSerializer. As such, PowerSerializer implements some key safety features to minimize the risk of serialization-based attacks. In addition to utilizing PowerSerializer's safety features, all consumers of the library are encouraged to read more about serialization security.

@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v2.0": {},
     ".NETStandard,Version=v2.0/": {
-      "DouglasDwyer.PowerSerializer/1.0.0.1": {
+      "DouglasDwyer.PowerSerializer/1.0.0.2": {
         "dependencies": {
           "NETStandard.Library": "2.0.3",
           "System.Collections.Immutable": "5.0.0"
@@ -73,7 +73,7 @@
     }
   },
   "libraries": {
-    "DouglasDwyer.PowerSerializer/1.0.0.1": {
+    "DouglasDwyer.PowerSerializer/1.0.0.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

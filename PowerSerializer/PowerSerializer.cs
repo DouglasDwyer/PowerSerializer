@@ -57,6 +57,13 @@ namespace DouglasDwyer.PowerSerializer
                         TypeResolver.WriteTypeID(writer, objType);
                         writer.Write((int)(writer.BaseStream.Position - pos));
                     }
+                    else if(obj is Type typeRepresentation)
+                    {
+                        TypeResolver.WriteTypeID(writer, typeRepresentation);
+                        long pos = writer.BaseStream.Position;
+                        TypeResolver.WriteTypeID(writer, typeof(Type));
+                        writer.Write((int)(writer.BaseStream.Position - pos));
+                    }
                     else if(objType.IsPrimitive)
                     {
                         WritePrimitiveObject(writer, obj);
@@ -259,6 +266,13 @@ namespace DouglasDwyer.PowerSerializer
             {
                 writer.Write(context.GetObjectID(obj));
             }
+            else if (obj is Type typeRepresentation)
+            {
+                (ushort, Type) objectData = context.RegisterObject(obj);
+                writer.Write(objectData.Item1);
+                writer.Write(context.GetTypeID(typeof(Type)));
+                TypeResolver.WriteTypeID(writer, typeRepresentation);                
+            }
             else
             {
                 (ushort, Type) objectData = context.RegisterObject(obj);
@@ -316,7 +330,7 @@ namespace DouglasDwyer.PowerSerializer
                     ReadFlattenedArray(context, reader, array, 0, ranks, new int[array.Rank]);
                 }
             }
-            else if(type.IsPrimitive) { }
+            else if(type.IsPrimitive || obj is Type) { }
             else
             {
                 DeserializeReferenceType(context, reader, obj, type);
@@ -383,6 +397,10 @@ namespace DouglasDwyer.PowerSerializer
             if (type == typeof(string))
             {
                 toReturn = reader.ReadString();
+            }
+            else if(type == typeof(Type))
+            {
+                toReturn = TypeResolver.ReadTypeID(reader);
             }
             else if (type.IsPrimitive)
             {

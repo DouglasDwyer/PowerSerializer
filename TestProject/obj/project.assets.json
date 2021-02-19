@@ -11,7 +11,7 @@
           "lib/netstandard2.0/System.Collections.Immutable.dll": {}
         }
       },
-      "DouglasDwyer.PowerSerializer/1.0.0.1": {
+      "DouglasDwyer.PowerSerializer/1.0.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -53,7 +53,7 @@
         "version.txt"
       ]
     },
-    "DouglasDwyer.PowerSerializer/1.0.0.1": {
+    "DouglasDwyer.PowerSerializer/1.0.0.2": {
       "type": "project",
       "path": "../PowerSerializer/PowerSerializer.csproj",
       "msbuildProject": "../PowerSerializer/PowerSerializer.csproj"
@@ -61,7 +61,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "DouglasDwyer.PowerSerializer >= 1.0.0.1"
+      "DouglasDwyer.PowerSerializer >= 1.0.0.2"
     ]
   },
   "packageFolders": {

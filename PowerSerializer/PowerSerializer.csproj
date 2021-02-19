@@ -15,11 +15,11 @@
     <RepositoryUrl>https://github.com/DouglasDwyer/PowerSerializer</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en</NeutralLanguage>
-    <AssemblyVersion>1.0.0.1</AssemblyVersion>
-    <FileVersion>1.0.0.1</FileVersion>
-    <PackageReleaseNotes>Added documentation and tags.</PackageReleaseNotes>
+    <AssemblyVersion>1.0.0.2</AssemblyVersion>
+    <FileVersion>1.0.0.2</FileVersion>
+    <PackageReleaseNotes>Added better support for serialization of type objects.</PackageReleaseNotes>
     <PackageTags>serialization csharp binary collections arrays polymorphism serialization-library csharp-library</PackageTags>
-    <Version>1.0.0.1</Version>
+    <Version>1.0.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

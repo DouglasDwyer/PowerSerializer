@@ -15,10 +15,8 @@ namespace TestProject
         static void Main(string[] args)
         {
             PowerSerializer ser = new PowerSerializer();
-            List<object> objs = new List<object>() { 73, "hello", null };
-            byte[] data = ser.Serialize(objs);
-            List<object> deserialized = ser.Deserialize<List<object>>(data);
-            Console.WriteLine(objs.SequenceEqual(deserialized)); 
+            byte[] data = ser.Serialize(new[] { typeof(Program), null, typeof(string) });
+            object deserialized = ser.Deserialize(data);
 
             Console.ReadKey();
         }

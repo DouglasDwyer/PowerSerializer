@@ -56,6 +56,10 @@ namespace DouglasDwyer.PowerSerializer
         public (ushort id, Type type) RegisterObject(object obj)
         {
             Type type = obj.GetType();
+            if(obj is Type)
+            {
+                type = typeof(Type);
+            }
             if(!SerializedTypes.ContainsKey(type))
             {
                 SerializedTypes[type] = (ushort)SerializedTypes.Count;

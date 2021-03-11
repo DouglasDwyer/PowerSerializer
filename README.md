@@ -1,3 +1,6 @@
+[![Nuget](https://img.shields.io/nuget/v/DouglasDwyer.PowerSerializer)](https://www.nuget.org/packages/DouglasDwyer.PowerSerializer)
+[![Downloads](https://img.shields.io/nuget/dt/DouglasDwyer.PowerSerializer)](https://www.nuget.org/packages/DouglasDwyer.PowerSerializer)
+
 # PowerSerializer
  PowerSerializer is a fast, efficient, customizable C# binary serializer that can serialize absolutely anything.
 

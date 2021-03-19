@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v3.1": {
       "TestProject/1.0.0": {
         "dependencies": {
-          "DouglasDwyer.PowerSerializer": "1.0.0.1"
+          "DouglasDwyer.PowerSerializer": "1.0.0.2"
         },
         "runtime": {
           "TestProject.dll": {}
@@ -22,7 +22,7 @@
           }
         }
       },
-      "DouglasDwyer.PowerSerializer/1.0.0.1": {
+      "DouglasDwyer.PowerSerializer/1.0.0.2": {
         "dependencies": {
           "System.Collections.Immutable": "5.0.0"
         },
@@ -45,7 +45,7 @@
       "path": "system.collections.immutable/5.0.0",
       "hashPath": "system.collections.immutable.5.0.0.nupkg.sha512"
     },
-    "DouglasDwyer.PowerSerializer/1.0.0.1": {
+    "DouglasDwyer.PowerSerializer/1.0.0.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

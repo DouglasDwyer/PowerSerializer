@@ -78,16 +78,22 @@
     <h3 id="classes">Classes
   </h3>
       <h4><a class="xref" href="DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.html">ClassLimitedTypeResolver</a></h4>
-      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html">FinalizerLimitedTypeResolver</a> allow for serialization of all the classes specified in the constructor, as well as all structs loaded at resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.</p>
+      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.html">FinalizerLimitedGuidTypeResolver</a> allow for serialization of all the classes specified in the constructor, as well as all structs loaded at resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.</p>
 </section>
-      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html">FinalizerLimitedTypeResolver</a></h4>
-      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html">FinalizerLimitedTypeResolver</a> allow for serialization of any type loaded in the current <span class="xref">System.AppDomain</span> upon resolver construction, provided that the type doesn't have a finalizer. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.</p>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.html">FinalizerLimitedGuidTypeResolver</a></h4>
+      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.html">FinalizerLimitedGuidTypeResolver</a> allow for serialization of any type loaded in the current <span class="xref">System.AppDomain</span> upon resolver construction, provided that the type doesn't have a finalizer. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.</p>
+</section>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.html">FinalizerLimitedNameTypeResolver</a></h4>
+      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.html">FinalizerLimitedNameTypeResolver</a> allow for serialization of any type loaded in the current <span class="xref">System.AppDomain</span> upon resolver construction, provided that the type doesn't have a finalizer. They utilize the a type's assembly-qualified name in order to resolve it across serialization boundaries.</p>
 </section>
       <h4><a class="xref" href="DouglasDwyer.PowerSerializer.FullGuidTypeResolver.html">FullGuidTypeResolver</a></h4>
       <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.FullGuidTypeResolver.html">FullGuidTypeResolver</a> allow for serialization of any and all types loaded in the current <span class="xref">System.AppDomain</span> upon resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.</p>
 </section>
       <h4><a class="xref" href="DouglasDwyer.PowerSerializer.GuidTypeResolver.html">GuidTypeResolver</a></h4>
       <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.GuidTypeResolver.html">GuidTypeResolver</a> utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries. They allow for serialization of any type specified in the constructor.</p>
+</section>
+      <h4><a class="xref" href="DouglasDwyer.PowerSerializer.NameTypeResolver.html">NameTypeResolver</a></h4>
+      <section><p>Instances of <a class="xref" href="DouglasDwyer.PowerSerializer.NameTypeResolver.html">NameTypeResolver</a> utilize the a type's assembly-qualified name in order to resolve it across serialization boundaries. They allow for serialization of all types.</p>
 </section>
       <h4><a class="xref" href="DouglasDwyer.PowerSerializer.PowerDeserializationContext.html">PowerDeserializationContext</a></h4>
       <section><p>Stores data about a <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html">PowerSerializer</a>'s deserialization operation, including a list of serialized types as well as the current object graph. This class, along with <a class="xref" href="DouglasDwyer.PowerSerializer.PowerSerializer.html#DouglasDwyer_PowerSerializer_PowerSerializer_CreateDeserializationContext">CreateDeserializationContext()</a>, may be overriden to store additional information.</p>

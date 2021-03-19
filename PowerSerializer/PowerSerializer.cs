@@ -18,9 +18,9 @@ namespace DouglasDwyer.PowerSerializer
         public ITypeResolver TypeResolver { get; }
 
         /// <summary>
-        /// Creates a new serializer instance with a <see cref="FinalizerLimitedTypeResolver"/> limited to types without finalizers.
+        /// Creates a new serializer instance with a <see cref="FinalizerLimitedGuidTypeResolver"/> limited to types without finalizers.
         /// </summary>
-        public PowerSerializer() : this(new FinalizerLimitedTypeResolver()) { }
+        public PowerSerializer() : this(new FinalizerLimitedGuidTypeResolver()) { }
 
         /// <summary>
         /// Creates a new serializer instance with the specified type resolver.

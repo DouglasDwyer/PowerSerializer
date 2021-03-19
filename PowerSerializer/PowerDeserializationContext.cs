@@ -30,7 +30,7 @@ namespace DouglasDwyer.PowerSerializer
         /// <summary>
         /// Gets type associated with a given ID, or throws an exception if the type isn't registered in the known types list.
         /// </summary>
-        /// <param name="type">The ID of the type to retrieve.</param>
+        /// <param name="id">The ID of the type to retrieve.</param>
         /// <returns>The identified type.</returns>
         public Type GetTypeFromID(ushort id)
         {
@@ -40,7 +40,7 @@ namespace DouglasDwyer.PowerSerializer
         /// <summary>
         /// Returns whether the given object is already instantiated and registered in the object graph.
         /// </summary>
-        /// <param name="obj">The ID of the object to check.</param>
+        /// <param name="id">The ID of the object to check.</param>
         /// <returns>Whether the object is already in the deserialization object graph.</returns>
         public bool HasObject(ushort id)
         {
@@ -50,7 +50,7 @@ namespace DouglasDwyer.PowerSerializer
         /// <summary>
         /// Returns the object with the given reference ID, or throws an exception if the object isn't registered in the object graph.
         /// </summary>
-        /// <param name="obj">The ID of the object to retrieve.</param>
+        /// <param name="id">The ID of the object to retrieve.</param>
         /// <returns>The identified object.</returns>
         public object GetObject(ushort id)
         {

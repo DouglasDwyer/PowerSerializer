@@ -15,11 +15,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("PowerSerializer is a fast, efficient, customizable C# binary serializer that can " +
     "serialize absolutely anything.")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.2")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0.2")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0.3")]
 [assembly: System.Reflection.AssemblyProductAttribute("PowerSerializer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DouglasDwyer.PowerSerializer")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.2")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.3")]
 [assembly: System.Reflection.AssemblyMetadataAttribute("RepositoryUrl", "https://github.com/DouglasDwyer/PowerSerializer")]
 [assembly: System.Resources.NeutralResourcesLanguageAttribute("en")]
 

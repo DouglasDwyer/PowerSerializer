@@ -15,7 +15,7 @@ namespace TestProject
         static void Main(string[] args)
         {
             PowerSerializer ser = new PowerSerializer();
-            byte[] data = ser.Serialize(new[] { typeof(Program), null, typeof(string) });
+            byte[] data = ser.Serialize(new Container() { Yert = new[] { typeof(string) } });
             object deserialized = ser.Deserialize(data);
 
             Console.ReadKey();
@@ -49,6 +49,11 @@ namespace TestProject
 
             Console.WriteLine("Total time for p: " + pTime.TotalMilliseconds + " and for s: " + sTime.TotalMilliseconds);
         }
+    }
+
+    public class Container
+    {
+        public Type[] Yert;
     }
 
     [Serializable]

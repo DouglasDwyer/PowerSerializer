@@ -130,7 +130,7 @@
 public class FullGuidTypeResolver : GuidTypeResolver, ITypeResolver</code></pre>
   </div>
   <h5 id="DouglasDwyer_PowerSerializer_FullGuidTypeResolver_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks"><p>Allowing deserialization of all types is dangerous unless the data to be deserialized is fully trusted. Attackers can submit deserialization payloads that generate objects in invalid states, or objects that may cause unwanted code execution during their finalization routines. Consider using a <a class="xref" href="DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.html">ClassLimitedTypeResolver</a> or <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html">FinalizerLimitedTypeResolver</a> instead to minimize security risks.</p>
+  <div class="markdown level0 remarks"><p>Allowing deserialization of all types is dangerous unless the data to be deserialized is fully trusted. Attackers can submit deserialization payloads that generate objects in invalid states, or objects that may cause unwanted code execution during their finalization routines. Consider using a <a class="xref" href="DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.html">ClassLimitedTypeResolver</a> or <a class="xref" href="DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.html">FinalizerLimitedGuidTypeResolver</a> instead to minimize security risks.</p>
 </div>
   <h3 id="constructors">Constructors
   </h3>

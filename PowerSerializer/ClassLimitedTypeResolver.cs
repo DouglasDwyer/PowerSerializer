@@ -6,7 +6,7 @@ using System.Reflection;
 namespace DouglasDwyer.PowerSerializer
 {
     /// <summary>
-    /// Instances of <see cref="FinalizerLimitedTypeResolver"/> allow for serialization of all the classes specified in the constructor, as well as all structs loaded at resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
+    /// Instances of <see cref="FinalizerLimitedGuidTypeResolver"/> allow for serialization of all the classes specified in the constructor, as well as all structs loaded at resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
     /// </summary>
     public class ClassLimitedTypeResolver : GuidTypeResolver
     {

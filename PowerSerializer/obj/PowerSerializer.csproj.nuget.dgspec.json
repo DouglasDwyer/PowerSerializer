@@ -5,7 +5,7 @@
   },
   "projects": {
     "D:\\Projects\\PowerSerializer\\PowerSerializer\\PowerSerializer.csproj": {
-      "version": "1.0.0.2",
+      "version": "1.0.0.3",
       "restore": {
         "projectUniqueName": "D:\\Projects\\PowerSerializer\\PowerSerializer\\PowerSerializer.csproj",
         "projectName": "DouglasDwyer.PowerSerializer",

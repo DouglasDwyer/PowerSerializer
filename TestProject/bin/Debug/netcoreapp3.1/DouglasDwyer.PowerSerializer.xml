@@ -6,7 +6,7 @@
     <members>
         <member name="T:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver">
             <summary>
-            Instances of <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver"/> allow for serialization of all the classes specified in the constructor, as well as all structs loaded at resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
+            Instances of <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver"/> allow for serialization of all the classes specified in the constructor, as well as all structs loaded at resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
             </summary>
         </member>
         <member name="M:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.#ctor">
@@ -34,21 +34,33 @@
             Creates a new resolver instance, allowing all of the given classes to be serialized.
             </summary>
         </member>
-        <member name="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver">
+        <member name="T:DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver">
             <summary>
-            Instances of <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver"/> allow for serialization of any type loaded in the current <see cref="T:System.AppDomain"/> upon resolver construction, provided that the type doesn't have a finalizer. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
+            Instances of <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver"/> allow for serialization of any type loaded in the current <see cref="T:System.AppDomain"/> upon resolver construction, provided that the type doesn't have a finalizer. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
             </summary>
         </member>
-        <member name="M:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.#ctor">
+        <member name="M:DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.#ctor">
             <summary>
             Creates a new resolver instance, allowing all currently-loaded types without a finalizer to be serialized.
             </summary>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver">
+            <summary>
+            Instances of <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver"/> allow for serialization of any type loaded in the current <see cref="T:System.AppDomain"/> upon resolver construction, provided that the type doesn't have a finalizer. They utilize the a type's assembly-qualified name in order to resolve it across serialization boundaries.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.IsTypeSerializable(System.Type)">
+            <summary>
+            Returns whether the given type should be serialized or deserialized.
+            </summary>
+            <param name="type">The type to examine.</param>
+            <returns>Whether the type is serializable.</returns>
         </member>
         <member name="T:DouglasDwyer.PowerSerializer.FullGuidTypeResolver">
             <summary>
             Instances of <see cref="T:DouglasDwyer.PowerSerializer.FullGuidTypeResolver"/> allow for serialization of any and all types loaded in the current <see cref="T:System.AppDomain"/> upon resolver construction. They utilize the MD5 hash of a type's name in order to resolve it across serialization boundaries.
             </summary>
-            <remarks>Allowing deserialization of all types is dangerous unless the data to be deserialized is fully trusted. Attackers can submit deserialization payloads that generate objects in invalid states, or objects that may cause unwanted code execution during their finalization routines. Consider using a <see cref="T:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver"/> or <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver"/> instead to minimize security risks.</remarks>
+            <remarks>Allowing deserialization of all types is dangerous unless the data to be deserialized is fully trusted. Attackers can submit deserialization payloads that generate objects in invalid states, or objects that may cause unwanted code execution during their finalization routines. Consider using a <see cref="T:DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver"/> or <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver"/> instead to minimize security risks.</remarks>
         </member>
         <member name="M:DouglasDwyer.PowerSerializer.FullGuidTypeResolver.#ctor">
             <summary>
@@ -66,12 +78,85 @@
             </summary>
             <param name="allowedTypes">The types to allow during serialization.</param>
         </member>
+        <member name="M:DouglasDwyer.PowerSerializer.GuidTypeResolver.IsTypeSerializable(System.Type)">
+            <summary>
+            Returns whether the given type should be serialized or deserialized.
+            </summary>
+            <param name="type">The type to examine.</param>
+            <returns>Whether the type is serializable.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.GuidTypeResolver.WriteTypeID(System.IO.BinaryWriter,System.Type)">
+            <summary>
+            Writes a binary representation of the given type's identity to the given binary writer's stream.
+            </summary>
+            <param name="writer">The binary writer to utilize.</param>
+            <param name="type">The type whose ID should be written.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.GuidTypeResolver.ReadTypeID(System.IO.BinaryReader)">
+            <summary>
+            Reads the binary representation of a type's identity from the given binary reader's stream and returns the type.
+            </summary>
+            <param name="reader">The binary reader from which to read.</param>
+            <returns>The type whose ID was written to the reader's stream.</returns>
+        </member>
         <member name="M:DouglasDwyer.PowerSerializer.GuidTypeResolver.GetTypeName(System.Type)">
             <summary>
             Returns a string identifying the given type. By default, this returns the assembly-qualified name, but this can be overriden to allow for serialization between different assemblies.
             </summary>
             <param name="type">The type to examine.</param>
             <returns>A name that uniquely identifies the type.</returns>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.ITypeResolver">
+            <summary>
+            Types that implement <see cref="T:DouglasDwyer.PowerSerializer.ITypeResolver"/> mediate which types can be serialized/deserialized by a <see cref="T:DouglasDwyer.PowerSerializer.PowerSerializer"/>. Additionally, they each provide a way to identify types across serialization boundaries.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ITypeResolver.IsTypeSerializable(System.Type)">
+            <summary>
+            Returns whether the given type should be serialized or deserialized.
+            </summary>
+            <param name="type">The type to examine.</param>
+            <returns>Whether the type is serializable.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ITypeResolver.WriteTypeID(System.IO.BinaryWriter,System.Type)">
+            <summary>
+            Writes a binary representation of the given type's identity to the given binary writer's stream.
+            </summary>
+            <param name="writer">The binary writer to utilize.</param>
+            <param name="type">The type whose ID should be written.</param>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.ITypeResolver.ReadTypeID(System.IO.BinaryReader)">
+            <summary>
+            Reads the binary representation of a type's identity from the given binary reader's stream and returns the type.
+            </summary>
+            <param name="reader">The binary reader from which to read.</param>
+            <returns>The type whose ID was written to the reader's stream.</returns>
+        </member>
+        <member name="T:DouglasDwyer.PowerSerializer.NameTypeResolver">
+            <summary>
+            Instances of <see cref="T:DouglasDwyer.PowerSerializer.NameTypeResolver"/> utilize the a type's assembly-qualified name in order to resolve it across serialization boundaries. They allow for serialization of all types.
+            </summary>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.NameTypeResolver.IsTypeSerializable(System.Type)">
+            <summary>
+            Returns whether the given type should be serialized or deserialized.
+            </summary>
+            <param name="type">The type to examine.</param>
+            <returns>Whether the type is serializable.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.NameTypeResolver.ReadTypeID(System.IO.BinaryReader)">
+            <summary>
+            Reads the binary representation of a type's identity from the given binary reader's stream and returns the type.
+            </summary>
+            <param name="reader">The binary reader from which to read.</param>
+            <returns>The type whose ID was written to the reader's stream.</returns>
+        </member>
+        <member name="M:DouglasDwyer.PowerSerializer.NameTypeResolver.WriteTypeID(System.IO.BinaryWriter,System.Type)">
+            <summary>
+            Writes a binary representation of the given type's identity to the given binary writer's stream.
+            </summary>
+            <param name="writer">The binary writer to utilize.</param>
+            <param name="type">The type whose ID should be written.</param>
         </member>
         <member name="T:DouglasDwyer.PowerSerializer.PowerDeserializationContext">
             <summary>
@@ -97,21 +182,21 @@
             <summary>
             Gets type associated with a given ID, or throws an exception if the type isn't registered in the known types list.
             </summary>
-            <param name="type">The ID of the type to retrieve.</param>
+            <param name="id">The ID of the type to retrieve.</param>
             <returns>The identified type.</returns>
         </member>
         <member name="M:DouglasDwyer.PowerSerializer.PowerDeserializationContext.HasObject(System.UInt16)">
             <summary>
             Returns whether the given object is already instantiated and registered in the object graph.
             </summary>
-            <param name="obj">The ID of the object to check.</param>
+            <param name="id">The ID of the object to check.</param>
             <returns>Whether the object is already in the deserialization object graph.</returns>
         </member>
         <member name="M:DouglasDwyer.PowerSerializer.PowerDeserializationContext.GetObject(System.UInt16)">
             <summary>
             Returns the object with the given reference ID, or throws an exception if the object isn't registered in the object graph.
             </summary>
-            <param name="obj">The ID of the object to retrieve.</param>
+            <param name="id">The ID of the object to retrieve.</param>
             <returns>The identified object.</returns>
         </member>
         <member name="M:DouglasDwyer.PowerSerializer.PowerDeserializationContext.RegisterNextObject(System.Object)">
@@ -180,7 +265,7 @@
         </member>
         <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.#ctor">
             <summary>
-            Creates a new serializer instance with a <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver"/> limited to types without finalizers.
+            Creates a new serializer instance with a <see cref="T:DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver"/> limited to types without finalizers.
             </summary>
         </member>
         <member name="M:DouglasDwyer.PowerSerializer.PowerSerializer.#ctor(DouglasDwyer.PowerSerializer.ITypeResolver)">
@@ -299,32 +384,6 @@
             Creates a memberwise copy of this object, returning a <see cref="T:DouglasDwyer.PowerSerializer.PowerSerializer"/> with the same settings as the original.
             </summary>
             <returns></returns>
-        </member>
-        <member name="T:DouglasDwyer.PowerSerializer.ITypeResolver">
-            <summary>
-            Types that implement <see cref="T:DouglasDwyer.PowerSerializer.ITypeResolver"/> mediate which types can be serialized/deserialized by a <see cref="T:DouglasDwyer.PowerSerializer.PowerSerializer"/>. Additionally, they each provide a way to identify types across serialization boundaries.
-            </summary>
-        </member>
-        <member name="M:DouglasDwyer.PowerSerializer.ITypeResolver.IsTypeSerializable(System.Type)">
-            <summary>
-            Returns whether the given type should be serialized or deserialized.
-            </summary>
-            <param name="type">The type to examine.</param>
-            <returns>Whether the type is serializable.</returns>
-        </member>
-        <member name="M:DouglasDwyer.PowerSerializer.ITypeResolver.WriteTypeID(System.IO.BinaryWriter,System.Type)">
-            <summary>
-            Writes a binary representation of the given type's identity to the given binary writer's stream.
-            </summary>
-            <param name="writer">The binary writer to utilize.</param>
-            <param name="type">The type whose ID should be written.</param>
-        </member>
-        <member name="M:DouglasDwyer.PowerSerializer.ITypeResolver.ReadTypeID(System.IO.BinaryReader)">
-            <summary>
-            Reads the binary representation of a type's identity from the given binary reader's stream and returns the type.
-            </summary>
-            <param name="reader">The binary reader from which to read.</param>
-            <returns>The type whose ID was written to the reader's stream.</returns>
         </member>
     </members>
 </doc>

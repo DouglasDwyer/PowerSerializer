@@ -9,7 +9,7 @@
       "output": {
         ".html": {
           "relative_path": "api/DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.html",
-          "hash": "Xoh1nu9k+5tg4s6H+Lr0HA=="
+          "hash": "+yIpXewP39p5XQ2x7f29bw=="
         }
       },
       "is_incremental": false,
@@ -17,11 +17,23 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.yml",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.yml",
       "output": {
         ".html": {
-          "relative_path": "api/DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html",
-          "hash": "9Sn3joLRoKu3nWMxETSl+A=="
+          "relative_path": "api/DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.html",
+          "hash": "1ukjB3z7SRiarwc9KS+ZJA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.html",
+          "hash": "xIugxvmNK7so/B/5sVjv/A=="
         }
       },
       "is_incremental": false,
@@ -33,7 +45,7 @@
       "output": {
         ".html": {
           "relative_path": "api/DouglasDwyer.PowerSerializer.FullGuidTypeResolver.html",
-          "hash": "md6dS+gieVBC3C0e04d1Zw=="
+          "hash": "kkNObJR/Up1GXbBqms7Ljg=="
         }
       },
       "is_incremental": false,
@@ -45,7 +57,7 @@
       "output": {
         ".html": {
           "relative_path": "api/DouglasDwyer.PowerSerializer.GuidTypeResolver.html",
-          "hash": "tkiQ7GUJyIkiK3InFIgHag=="
+          "hash": "J9+57FhuYXzs1Tb9RY3t8w=="
         }
       },
       "is_incremental": false,
@@ -57,7 +69,19 @@
       "output": {
         ".html": {
           "relative_path": "api/DouglasDwyer.PowerSerializer.ITypeResolver.html",
-          "hash": "V98/J++UPvCBnqqGoak0pA=="
+          "hash": "hxXy+Pq/Fmh5TLsOFFsjJg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DouglasDwyer.PowerSerializer.NameTypeResolver.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DouglasDwyer.PowerSerializer.NameTypeResolver.html",
+          "hash": "/gy0iQ6ZJfHhczQmTDR61w=="
         }
       },
       "is_incremental": false,
@@ -69,7 +93,7 @@
       "output": {
         ".html": {
           "relative_path": "api/DouglasDwyer.PowerSerializer.PowerDeserializationContext.html",
-          "hash": "v9SQhQpVromyMsBE0SqxKw=="
+          "hash": "66c7zSrYFvmHi+9KbbHeEg=="
         }
       },
       "is_incremental": false,
@@ -81,7 +105,7 @@
       "output": {
         ".html": {
           "relative_path": "api/DouglasDwyer.PowerSerializer.PowerSerializationContext.html",
-          "hash": "6XIm25F3ExtAJqpfl8WR7w=="
+          "hash": "uklRI3gSJfEPIsdTcxkzlQ=="
         }
       },
       "is_incremental": false,
@@ -93,7 +117,7 @@
       "output": {
         ".html": {
           "relative_path": "api/DouglasDwyer.PowerSerializer.PowerSerializer.html",
-          "hash": "WKV/xqNI5gI9Zir9KjaMMQ=="
+          "hash": "OpTC28/WoSjBE7DT970lHQ=="
         }
       },
       "is_incremental": false,
@@ -105,7 +129,7 @@
       "output": {
         ".html": {
           "relative_path": "api/DouglasDwyer.PowerSerializer.html",
-          "hash": "cZWWqJERhvEi1QkgveqnEQ=="
+          "hash": "TRxozy6HOxPvHflc/bej0w=="
         }
       },
       "is_incremental": false,
@@ -129,7 +153,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "OjEjQUk+Arw2qFWj+qeHrg=="
+          "hash": "fgnNekL/FQ6h8Lx/VkE7UQ=="
         }
       },
       "is_incremental": false,
@@ -144,7 +168,7 @@
           "hash": "TXChcGLs0tmNjnyxyu9x5w=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -163,24 +187,22 @@
   "incremental_info": [
     {
       "status": {
-        "can_incremental": false,
-        "details": "Cannot build incrementally because config changed.",
+        "can_incremental": true,
         "incrementalPhase": "build",
         "total_file_count": 0,
-        "skipped_file_count": 0,
-        "full_build_reason_code": "ConfigChanged"
+        "skipped_file_count": 0
       },
       "processors": {
         "ConceptualDocumentProcessor": {
-          "can_incremental": false,
+          "can_incremental": true,
           "incrementalPhase": "build",
           "total_file_count": 2,
-          "skipped_file_count": 0
+          "skipped_file_count": 2
         },
         "ManagedReferenceDocumentProcessor": {
-          "can_incremental": false,
+          "can_incremental": true,
           "incrementalPhase": "build",
-          "total_file_count": 9,
+          "total_file_count": 11,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {

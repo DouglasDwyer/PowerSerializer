@@ -62,25 +62,44 @@ references:
   isSpec: "True"
   fullName: DouglasDwyer.PowerSerializer.ClassLimitedTypeResolver.ClassLimitedTypeResolver
   nameWithType: ClassLimitedTypeResolver.ClassLimitedTypeResolver
-- uid: DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver
-  name: FinalizerLimitedTypeResolver
-  href: api/DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html
-  commentId: T:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver
-  fullName: DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver
-  nameWithType: FinalizerLimitedTypeResolver
-- uid: DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.#ctor
-  name: FinalizerLimitedTypeResolver()
-  href: api/DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html#DouglasDwyer_PowerSerializer_FinalizerLimitedTypeResolver__ctor
-  commentId: M:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.#ctor
-  fullName: DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.FinalizerLimitedTypeResolver()
-  nameWithType: FinalizerLimitedTypeResolver.FinalizerLimitedTypeResolver()
-- uid: DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.#ctor*
-  name: FinalizerLimitedTypeResolver
-  href: api/DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.html#DouglasDwyer_PowerSerializer_FinalizerLimitedTypeResolver__ctor_
-  commentId: Overload:DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.#ctor
+- uid: DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver
+  name: FinalizerLimitedGuidTypeResolver
+  href: api/DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.html
+  commentId: T:DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver
+  fullName: DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver
+  nameWithType: FinalizerLimitedGuidTypeResolver
+- uid: DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.#ctor
+  name: FinalizerLimitedGuidTypeResolver()
+  href: api/DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.html#DouglasDwyer_PowerSerializer_FinalizerLimitedGuidTypeResolver__ctor
+  commentId: M:DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.#ctor
+  fullName: DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.FinalizerLimitedGuidTypeResolver()
+  nameWithType: FinalizerLimitedGuidTypeResolver.FinalizerLimitedGuidTypeResolver()
+- uid: DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.#ctor*
+  name: FinalizerLimitedGuidTypeResolver
+  href: api/DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.html#DouglasDwyer_PowerSerializer_FinalizerLimitedGuidTypeResolver__ctor_
+  commentId: Overload:DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.#ctor
   isSpec: "True"
-  fullName: DouglasDwyer.PowerSerializer.FinalizerLimitedTypeResolver.FinalizerLimitedTypeResolver
-  nameWithType: FinalizerLimitedTypeResolver.FinalizerLimitedTypeResolver
+  fullName: DouglasDwyer.PowerSerializer.FinalizerLimitedGuidTypeResolver.FinalizerLimitedGuidTypeResolver
+  nameWithType: FinalizerLimitedGuidTypeResolver.FinalizerLimitedGuidTypeResolver
+- uid: DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver
+  name: FinalizerLimitedNameTypeResolver
+  href: api/DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.html
+  commentId: T:DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver
+  fullName: DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver
+  nameWithType: FinalizerLimitedNameTypeResolver
+- uid: DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.IsTypeSerializable(System.Type)
+  name: IsTypeSerializable(Type)
+  href: api/DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.html#DouglasDwyer_PowerSerializer_FinalizerLimitedNameTypeResolver_IsTypeSerializable_System_Type_
+  commentId: M:DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.IsTypeSerializable(System.Type)
+  fullName: DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.IsTypeSerializable(System.Type)
+  nameWithType: FinalizerLimitedNameTypeResolver.IsTypeSerializable(Type)
+- uid: DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.IsTypeSerializable*
+  name: IsTypeSerializable
+  href: api/DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.html#DouglasDwyer_PowerSerializer_FinalizerLimitedNameTypeResolver_IsTypeSerializable_
+  commentId: Overload:DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.IsTypeSerializable
+  isSpec: "True"
+  fullName: DouglasDwyer.PowerSerializer.FinalizerLimitedNameTypeResolver.IsTypeSerializable
+  nameWithType: FinalizerLimitedNameTypeResolver.IsTypeSerializable
 - uid: DouglasDwyer.PowerSerializer.FullGuidTypeResolver
   name: FullGuidTypeResolver
   href: api/DouglasDwyer.PowerSerializer.FullGuidTypeResolver.html
@@ -219,6 +238,51 @@ references:
   isSpec: "True"
   fullName: DouglasDwyer.PowerSerializer.ITypeResolver.WriteTypeID
   nameWithType: ITypeResolver.WriteTypeID
+- uid: DouglasDwyer.PowerSerializer.NameTypeResolver
+  name: NameTypeResolver
+  href: api/DouglasDwyer.PowerSerializer.NameTypeResolver.html
+  commentId: T:DouglasDwyer.PowerSerializer.NameTypeResolver
+  fullName: DouglasDwyer.PowerSerializer.NameTypeResolver
+  nameWithType: NameTypeResolver
+- uid: DouglasDwyer.PowerSerializer.NameTypeResolver.IsTypeSerializable(System.Type)
+  name: IsTypeSerializable(Type)
+  href: api/DouglasDwyer.PowerSerializer.NameTypeResolver.html#DouglasDwyer_PowerSerializer_NameTypeResolver_IsTypeSerializable_System_Type_
+  commentId: M:DouglasDwyer.PowerSerializer.NameTypeResolver.IsTypeSerializable(System.Type)
+  fullName: DouglasDwyer.PowerSerializer.NameTypeResolver.IsTypeSerializable(System.Type)
+  nameWithType: NameTypeResolver.IsTypeSerializable(Type)
+- uid: DouglasDwyer.PowerSerializer.NameTypeResolver.IsTypeSerializable*
+  name: IsTypeSerializable
+  href: api/DouglasDwyer.PowerSerializer.NameTypeResolver.html#DouglasDwyer_PowerSerializer_NameTypeResolver_IsTypeSerializable_
+  commentId: Overload:DouglasDwyer.PowerSerializer.NameTypeResolver.IsTypeSerializable
+  isSpec: "True"
+  fullName: DouglasDwyer.PowerSerializer.NameTypeResolver.IsTypeSerializable
+  nameWithType: NameTypeResolver.IsTypeSerializable
+- uid: DouglasDwyer.PowerSerializer.NameTypeResolver.ReadTypeID(System.IO.BinaryReader)
+  name: ReadTypeID(BinaryReader)
+  href: api/DouglasDwyer.PowerSerializer.NameTypeResolver.html#DouglasDwyer_PowerSerializer_NameTypeResolver_ReadTypeID_System_IO_BinaryReader_
+  commentId: M:DouglasDwyer.PowerSerializer.NameTypeResolver.ReadTypeID(System.IO.BinaryReader)
+  fullName: DouglasDwyer.PowerSerializer.NameTypeResolver.ReadTypeID(System.IO.BinaryReader)
+  nameWithType: NameTypeResolver.ReadTypeID(BinaryReader)
+- uid: DouglasDwyer.PowerSerializer.NameTypeResolver.ReadTypeID*
+  name: ReadTypeID
+  href: api/DouglasDwyer.PowerSerializer.NameTypeResolver.html#DouglasDwyer_PowerSerializer_NameTypeResolver_ReadTypeID_
+  commentId: Overload:DouglasDwyer.PowerSerializer.NameTypeResolver.ReadTypeID
+  isSpec: "True"
+  fullName: DouglasDwyer.PowerSerializer.NameTypeResolver.ReadTypeID
+  nameWithType: NameTypeResolver.ReadTypeID
+- uid: DouglasDwyer.PowerSerializer.NameTypeResolver.WriteTypeID(System.IO.BinaryWriter,System.Type)
+  name: WriteTypeID(BinaryWriter, Type)
+  href: api/DouglasDwyer.PowerSerializer.NameTypeResolver.html#DouglasDwyer_PowerSerializer_NameTypeResolver_WriteTypeID_System_IO_BinaryWriter_System_Type_
+  commentId: M:DouglasDwyer.PowerSerializer.NameTypeResolver.WriteTypeID(System.IO.BinaryWriter,System.Type)
+  fullName: DouglasDwyer.PowerSerializer.NameTypeResolver.WriteTypeID(System.IO.BinaryWriter, System.Type)
+  nameWithType: NameTypeResolver.WriteTypeID(BinaryWriter, Type)
+- uid: DouglasDwyer.PowerSerializer.NameTypeResolver.WriteTypeID*
+  name: WriteTypeID
+  href: api/DouglasDwyer.PowerSerializer.NameTypeResolver.html#DouglasDwyer_PowerSerializer_NameTypeResolver_WriteTypeID_
+  commentId: Overload:DouglasDwyer.PowerSerializer.NameTypeResolver.WriteTypeID
+  isSpec: "True"
+  fullName: DouglasDwyer.PowerSerializer.NameTypeResolver.WriteTypeID
+  nameWithType: NameTypeResolver.WriteTypeID
 - uid: DouglasDwyer.PowerSerializer.PowerDeserializationContext
   name: PowerDeserializationContext
   href: api/DouglasDwyer.PowerSerializer.PowerDeserializationContext.html

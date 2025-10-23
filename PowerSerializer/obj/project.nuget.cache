@@ -1,16 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "MCFD1k6SJ6vbVcbLyZwojs9wKHeznr0b5FaRfFztiQdsseyWQcDnK2yl3f6tymubgmYkbti1LNkTRNldksMU8w==",
+  "dgSpecHash": "BbIzBA5UNks=",
   "success": true,
   "projectFilePath": "D:\\Projects\\PowerSerializer\\PowerSerializer\\PowerSerializer.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Douglas\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
-    "C:\\Users\\Douglas\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
-    "C:\\Users\\Douglas\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
-    "C:\\Users\\Douglas\\.nuget\\packages\\system.collections.immutable\\5.0.0\\system.collections.immutable.5.0.0.nupkg.sha512",
-    "C:\\Users\\Douglas\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
-    "C:\\Users\\Douglas\\.nuget\\packages\\system.numerics.vectors\\4.4.0\\system.numerics.vectors.4.4.0.nupkg.sha512",
-    "C:\\Users\\Douglas\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.3\\system.runtime.compilerservices.unsafe.4.5.3.nupkg.sha512"
+    "C:\\Users\\Douglas\\.nuget\\packages\\microsoft.extensions.objectpool\\9.0.10\\microsoft.extensions.objectpool.9.0.10.nupkg.sha512",
+    "C:\\Users\\Douglas\\.nuget\\packages\\system.collections.immutable\\5.0.0\\system.collections.immutable.5.0.0.nupkg.sha512"
   ],
   "logs": []
 }

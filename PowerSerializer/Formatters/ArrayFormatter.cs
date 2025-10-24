@@ -5,30 +5,70 @@ namespace DouglasDwyer.PowerSerializer.Formatters;
 /// <summary>
 /// Serializes an array element-by-element.
 /// </summary>
-/// <typeparam name="T">The element type of the array.</typeparam>
 /// <typeparam name="A">The array type itself.</typeparam>
-internal sealed class ArrayFormatter<T, A> : ArrayFormatterBase<T, A> where A : notnull
+public sealed class ArrayFormatter<A> : IFormatter<A> where A : notnull
 {
     /// <summary>
-    /// The formatter to use for individual array elements.
+    /// The specialized formatter type to use.
     /// </summary>
-    private readonly IFormatter<T> _elementFormatter;
+    private readonly IFormatter<A> _concreteFormatter;
 
-    /// <inheritdoc/>
-    protected override void DeserializeElements(BufferReader reader, Span<T> elements)
+    /// <summary>
+    /// Creates a new array formatter.
+    /// </summary>
+    /// <param name="serializer">The serializer that will use this format.</param>
+    /// <exception cref="ArgumentException">
+    /// If <typeparamref name="A"/> was not a valid array type.
+    /// </exception>
+    public ArrayFormatter(PowerSerializer serializer)
     {
-        for (var i = 0; i < elements.Length; i++)
-        {
-            _elementFormatter.Deserialize(reader, out elements[i]);
-        }
+        _concreteFormatter = ArrayFormatterHelpers.GetConcreteFormatter<A>(serializer, typeof(ConcreteFormatter<>));
     }
 
     /// <inheritdoc/>
-    protected override void SerializeElements(BufferWriter writer, Span<T> elements)
+    public void Deserialize(BufferReader reader, out A value)
     {
-        for (var i = 0; i < elements.Length; i++)
+        _concreteFormatter.Deserialize(reader, out value);
+    }
+
+    /// <inheritdoc/>
+    public void Serialize(BufferWriter writer, in A value)
+    {
+        _concreteFormatter.Serialize(writer, value);
+    }
+
+    /// <summary>
+    /// Specialized formatter implementation.
+    /// </summary>
+    /// <typeparam name="T">The element type of the array.</typeparam>
+    private sealed class ConcreteFormatter<T> : ArrayFormatterHelpers.ConcreteFormatterBase<T, A>
+    {
+        /// <summary>
+        /// The formatter to use for individual array elements.
+        /// </summary>
+        private readonly IFormatter<T?> _elementFormatter;
+
+        public ConcreteFormatter(PowerSerializer serializer)
         {
-            _elementFormatter.Serialize(writer, elements[i]);
+            _elementFormatter = serializer.GetFormatter<T>();
+        }
+
+        /// <inheritdoc/>
+        protected override void DeserializeElements(BufferReader reader, Span<T?> elements)
+        {
+            for (var i = 0; i < elements.Length; i++)
+            {
+                _elementFormatter.Deserialize(reader, out elements[i]);
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override void SerializeElements(BufferWriter writer, Span<T?> elements)
+        {
+            for (var i = 0; i < elements.Length; i++)
+            {
+                _elementFormatter.Serialize(writer, elements[i]);
+            }
         }
     }
 }

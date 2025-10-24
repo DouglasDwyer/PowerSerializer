@@ -1,6 +1,9 @@
 ﻿using DouglasDwyer.PowerSerializer.Formatters;
 using System;
 using System.Buffers;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -12,17 +15,14 @@ namespace DouglasDwyer.PowerSerializer;
 
 public sealed class PowerSerializer
 {
-    /// <summary>
-    /// Where to find new assemblies during deserialization.
-    /// </summary>
-    private readonly AssemblyLoadContext _assemblyLoader;
+    private readonly FormatterList _formatterList;
 
-    private readonly ConditionalWeakTable<Type, object> _formatters;
+    private readonly ConditionalWeakTable<Type, FormatterSet> _formatters;
 
     public PowerSerializer()
     {
-        _assemblyLoader = AssemblyLoadContext.GetLoadContext(Assembly.GetCallingAssembly())!;
-        _formatters = new ConditionalWeakTable<Type, object>();
+        _formatterList = FormatterList.Default;  // todo
+        _formatters = new ConditionalWeakTable<Type, FormatterSet>();
     }
 
     /// <inheritdoc cref="Serialize{T}(IBufferWriter{byte}, in T)"/>
@@ -65,13 +65,20 @@ public sealed class PowerSerializer
     /// </typeparam>
     /// <param name="data">A buffer containing the data produced during serialization.</param>
     /// <returns>The generated object.</returns>
-    public T Deserialize<T>(ReadOnlySpan<byte> data)
+    public T? Deserialize<T>(ReadOnlySpan<byte> data)
     {
         var context = DeserializationContext.Pool.Get();
         try
         {
             var position = 0;
             GetFormatter<T>().Deserialize(new BufferReader(context, data, ref position), out var result);
+
+            if (position != data.Length)
+            {
+                // todo: think about generalizing this
+                throw new InvalidDataException("Deserialization did not consume all bytes in the provided data");
+            }
+
             return result;
         }
         finally
@@ -80,20 +87,51 @@ public sealed class PowerSerializer
         }
     }
 
-    public IFormatter<T> GetFormatter<T>()
+    public IFormatter<T?> GetFormatter<T>()
     {
-        throw new Exception();
-    }
-
-    private sealed class TypeFormatData<T>
-    {
-        public readonly IFormatter<T> ReferenceFormatter;
-        public readonly IFormatter<T> ValueFormatter;
-
-        public TypeFormatData(IFormatter<T> valueFormatter, bool polymorphic)
+        if (_formatters.TryGetValue(typeof(T), out var formatterSet))
         {
+            return formatterSet.GetFormatter<T>();
+        }
+        else
+        {
+            foreach (var entry in _formatterList.Entries)
+            {
+                var equation = new GenericEquation(entry.FormatterType.GetGenericArguments());
+                foreach (var iface in entry.FormatterType.GetInterfaces())
+                {
+                    if (equation.Solve(typeof(IFormatter<T>), iface, out var substitutions))
+                    {
+                        try
+                        {
+                            var concreteType = entry.FormatterType.IsGenericType ? entry.FormatterType.MakeGenericType(substitutions) : entry.FormatterType;
+                            var formatter = RuntimeHelpers.GetUninitializedObject(concreteType);
+
+                            // temporarily add formatter to lists..?
+                            entry.Construct(formatter, this);
+                        }
+                        catch
+                        {
+                            // Substitution failed (perhaps due to a generic parameter constraint or constructor exception)
+                            // todo: remove formatter if failed.
+                        }
+                    }
+                }
+            }
+
 
         }
+            // check _formatters and return
+            // go through each type in _formatterList
+            // if generics solvable
+            //   if type CONCRETE and we already have it in the concrete dictionary, cast and ADD it
+            //   else try construct formatter - if success, add it.
+            //   otherwise, move next formatter
+            // if value type, return formatter
+            // if reference type, return reference formatter (which may be polymorphic for non-sealed types)
+
+            // need to store 1 formatter: the thing returned from this (+ the ty-erased formatter for polymorphic scenarios)
+            throw new NotImplementedException();
     }
 
     /// <summary>
@@ -108,5 +146,15 @@ public sealed class PowerSerializer
             && !type.IsSealed
             && !type.IsAssignableTo(typeof(Assembly))
             && !(type != typeof(MemberInfo) && type.IsAssignableTo(typeof(MemberInfo)));
+    }
+
+    private sealed class FormatterSet
+    {
+        private readonly object _formatter;
+        private readonly IFormatter<object> _polymorphicFormatter;
+
+        public IFormatter<object> GetPolymorphicFormatter() => _polymorphicFormatter;
+
+        public IFormatter<T?> GetFormatter<T>() => (IFormatter<T?>)_formatter;
     }
 }

@@ -1,194 +1,51 @@
 ﻿using System;
-using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Runtime.Loader;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
 
 /// <summary>
-/// Serializes types from the <c>System.Reflection</c> namespace, like <see cref="Assembly"/> and <see cref="Type"/>.
+/// Serializes <see cref="Type"/> objects, including arrays and generics.
 /// </summary>
-internal sealed class ReflectionFormatter :
-    IFormatter<Assembly>,
-    IFormatter<EventInfo>,
-    IFormatter<FieldInfo>,
-    IFormatter<MethodBase>,
-    IFormatter<MethodInfo>,
-    IFormatter<PropertyInfo>,
-    IFormatter<Type>
+public sealed class TypeFormatter : IFormatter<Type>
 {
     /// <summary>
-    /// Where to find new assemblies.
+    /// Formats assembly references.
     /// </summary>
-    private readonly AssemblyLoadContext _assemblyLoader;
+    private readonly IFormatter<Assembly?> _assemblyFormatter;
 
     /// <summary>
-    /// Writes assemblies as reference objects. If the same assembly is stored twice, then,
-    /// it is written as a short code (rather than a full name).
+    /// Formats method references. Used when serializing the generic
+    /// type parameters of methods.
     /// </summary>
-    private readonly ReferenceFormatter<Assembly> _assemblyReferenceFormatter;
+    private readonly IFormatter<MethodInfo?> _methodFormatter;
 
     /// <summary>
-    /// Writes methods as reference objects. If the same method is stored twice, then,
-    /// it is written as a short code (rather than a full name).
+    /// A reference serializer that will recursively fall back to this
+    /// <see cref="TypeFormatter"/> when it encounters a new type.
     /// </summary>
-    private readonly ReferenceFormatter<MethodInfo> _methodReferenceFormatter;
+    private readonly IFormatter<Type?> _typeReferenceFormatter;
 
     /// <summary>
-    /// Writes types as reference objects. If the same type is stored twice, then,
-    /// it is written as a short code (rather than a full name).
+    /// Initializes a type formatter.
     /// </summary>
-    private readonly ReferenceFormatter<Type> _typeReferenceFormatter;
-
-    // todo: add well-known assemblies
-    // todo: add well-known types
-
-    public ReflectionFormatter()
+    /// <param name="serializer">
+    /// The serializer associated with this formatter.
+    /// </param>
+    public TypeFormatter(PowerSerializer serializer)
     {
-        _assemblyLoader = AssemblyLoadContext.GetLoadContext(Assembly.GetCallingAssembly()) ?? AssemblyLoadContext.Default;
-        _assemblyReferenceFormatter = new ReferenceFormatter<Assembly>(this);
-        _methodReferenceFormatter = new ReferenceFormatter<MethodInfo>(this);
-        _typeReferenceFormatter = new ReferenceFormatter<Type>(this);
-    }
-
-    /// <inheritdoc/>
-    public void Deserialize(BufferReader reader, out Assembly value)
-    {
-        var name = reader.ReadString(Encoding.ASCII);
-        var version = new Version(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
-        value = _assemblyLoader.LoadFromAssemblyName(new AssemblyName() { Name = name, Version = version });
-    }
-
-    /// <inheritdoc/>
-    public void Serialize(BufferWriter writer, in Assembly value)
-    {
-        var qualifiedName = value.GetName();
-        var name = qualifiedName.Name;
-        var version = qualifiedName.Version;
-
-        if (name is null)
-        {
-            throw new NotSupportedException("Serializing runtime-generated assemblies not supported");
-        }
-        else
-        {
-            writer.WriteString(name, Encoding.ASCII);
-            writer.WriteInt32(version?.Major ?? 0);
-            writer.WriteInt32(version?.Minor ?? 0);
-            writer.WriteInt32(version?.Build ?? 0);
-            writer.WriteInt32(version?.Revision ?? 0);
-        }
-    }
-
-    /// <inheritdoc/>
-    public void Serialize(BufferWriter writer, in EventInfo value)
-    {
-        _typeReferenceFormatter.Serialize(writer, value.DeclaringType);
-        writer.WriteString(value.Name, Encoding.ASCII);
-    }
-
-    /// <inheritdoc/>
-    public void Deserialize(BufferReader reader, out EventInfo value)
-    {
-        _typeReferenceFormatter.Deserialize(reader, out var type);
-        ThrowInvalidDataExceptionIfNull(type, "EventInfo was not encoded properly: expected declaring type, but got null");
-
-        var name = reader.ReadString(Encoding.ASCII);
-        var result = type.GetEvent(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-
-        if (result is null)
-        {
-            throw new InvalidDataException($"Unrecognized event {name} for type {type}");
-        }
-
-        value = result;
-    }
-
-    /// <inheritdoc/>
-    public void Serialize(BufferWriter writer, in FieldInfo value)
-    {
-        _typeReferenceFormatter.Serialize(writer, value.DeclaringType);
-        writer.WriteString(value.Name, Encoding.ASCII);
-    }
-
-    /// <inheritdoc/>
-    public void Deserialize(BufferReader reader, out FieldInfo value)
-    {
-        _typeReferenceFormatter.Deserialize(reader, out var type);
-        ThrowInvalidDataExceptionIfNull(type, "FieldInfo was not encoded properly: expected declaring type, but got null");
-
-        var name = reader.ReadString(Encoding.ASCII);
-        var result = type.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-
-        if (result is null)
-        {
-            throw new InvalidDataException($"Unrecognized field {name} for type {type}");
-        }
-
-        value = result;
-    }
-
-    /// <inheritdoc/>
-    public void Serialize(BufferWriter writer, in MethodBase value)
-    {
-        _typeReferenceFormatter.Serialize(writer, value.DeclaringType);
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public void Deserialize(BufferReader reader, out MethodBase value)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public void Serialize(BufferWriter writer, in MethodInfo value)
-    {
-        Serialize(writer, (MethodBase)value);
-    }
-
-    /// <inheritdoc/>
-    public void Deserialize(BufferReader reader, out MethodInfo value)
-    {
-        Deserialize(reader, out MethodBase result);
-        value = (MethodInfo)result;
-    }
-
-    /// <inheritdoc/>
-    public void Serialize(BufferWriter writer, in PropertyInfo value)
-    {
-        _typeReferenceFormatter.Serialize(writer, value.DeclaringType);
-        writer.WriteString(value.Name, Encoding.ASCII);
-    }
-
-    /// <inheritdoc/>
-    public void Deserialize(BufferReader reader, out PropertyInfo value)
-    {
-        _typeReferenceFormatter.Deserialize(reader, out var type);
-        ThrowInvalidDataExceptionIfNull(type, "PropertyInfo was not encoded properly: expected declaring type, but got null");
-
-        var name = reader.ReadString(Encoding.ASCII);
-        var result = type.GetProperty(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-
-        if (result is null)
-        {
-            throw new InvalidDataException($"Unrecognized event {name} for type {type}");
-        }
-
-        value = result;
+        _assemblyFormatter = serializer.GetFormatter<Assembly>();
+        _methodFormatter = null!;// serializer.GetFormatter<MethodInfo>();
+        _typeReferenceFormatter = serializer.GetFormatter<Type>();
     }
 
     /// <inheritdoc/>
     public void Deserialize(BufferReader reader, out Type value)
     {
+        // todo: handle array
+
         var kind = (GenericKind)reader.ReadUInt8();
 
         if (kind == GenericKind.TypeParameter)
@@ -200,7 +57,7 @@ internal sealed class ReflectionFormatter :
         else if (kind == GenericKind.MethodParameter)
         {
             var position = reader.ReadUInt8();
-            _methodReferenceFormatter.Deserialize(reader, out var parent);
+            _methodFormatter.Deserialize(reader, out var parent);
             value = parent!.GetGenericArguments()[position];
         }
         else if (kind == GenericKind.Constructed)
@@ -226,10 +83,10 @@ internal sealed class ReflectionFormatter :
             var rawName = reader.ReadString(Encoding.ASCII);
             var fullName = 0 < genericCount ? $"{rawName}`{genericCount}" : rawName;
 
-            _assemblyReferenceFormatter.Deserialize(reader, out var assembly);
+            _assemblyFormatter.Deserialize(reader, out var assembly);
             ThrowInvalidDataExceptionIfNull(assembly, "Type was not encoded properly: expected assembly, but got null");
             var result = assembly.GetType(fullName);
-            
+
             if (result is null)
             {
                 throw new TypeLoadException($"Unable to load type {fullName} from {assembly.FullName}");
@@ -252,7 +109,7 @@ internal sealed class ReflectionFormatter :
         {
             writer.WriteUInt8((byte)GenericKind.MethodParameter);
             writer.WriteUInt8((byte)value.GenericParameterPosition);
-            _methodReferenceFormatter.Serialize(writer, (MethodInfo)value.DeclaringMethod!);
+            _methodFormatter.Serialize(writer, (MethodInfo)value.DeclaringMethod!);
         }
         else if (value.IsConstructedGenericType)
         {
@@ -277,7 +134,7 @@ internal sealed class ReflectionFormatter :
 
             writer.WriteUInt8((byte)GenericKind.Definition(genericCount));
             writer.WriteString(NamespaceQualifiedName(genericDefinition), Encoding.ASCII);
-            _assemblyReferenceFormatter.Serialize(writer, genericDefinition.Assembly);
+            _assemblyFormatter.Serialize(writer, genericDefinition.Assembly);
         }
         else
         {
@@ -293,7 +150,7 @@ internal sealed class ReflectionFormatter :
         }
     }
 
-    private string NamespaceQualifiedName(Type type)
+    private static string NamespaceQualifiedName(Type type)
     {
         var result = type.Name;
         var backTickIndex = result.IndexOf("`");

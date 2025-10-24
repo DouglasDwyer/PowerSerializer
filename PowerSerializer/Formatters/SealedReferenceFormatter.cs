@@ -41,14 +41,14 @@ internal sealed class SealedReferenceFormatter<T> : IFormatter<T?> where T : cla
         {
             ref var result = ref reader.Context.AddObject();
 
-            // Safety: result starts off as `null` and is only read/written by the deserializer,
+            // Safety: result starts off as null and is only read/written by the deserializer,
             // so this cast does not expose type variance.
             ref var derivedResult = ref Unsafe.As<object?, T?>(ref result);
             _valueFormatter.Deserialize(reader, out derivedResult);
 
             if (result is null)
             {
-                throw new InvalidDataException("Expected non-null object, but deserializer did not write to output value");
+                throw new InvalidDataException("Expected non-null object, but deserializer did not initialize output value");
             }
 
             value = derivedResult;

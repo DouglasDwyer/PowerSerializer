@@ -9,6 +9,8 @@ using System.Runtime.Loader;
 
 namespace DouglasDwyer.PowerSerializer;
 
+// todo: better name, this one conflicts with namespace
+
 public sealed class PowerSerializer
 {
     /// <summary>

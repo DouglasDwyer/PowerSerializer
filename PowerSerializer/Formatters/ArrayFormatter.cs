@@ -2,6 +2,11 @@
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
 
+/// <summary>
+/// Serializes an array element-by-element.
+/// </summary>
+/// <typeparam name="T">The element type of the array.</typeparam>
+/// <typeparam name="A">The array type itself.</typeparam>
 internal sealed class ArrayFormatter<T, A> : ArrayFormatterBase<T, A> where A : notnull
 {
     /// <summary>

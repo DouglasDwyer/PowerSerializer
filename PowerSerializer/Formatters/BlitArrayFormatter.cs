@@ -3,13 +3,16 @@ using System.Runtime.InteropServices;
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
 
-internal class UnmanagedArrayFormatter<T, A> : ArrayFormatterBase<T, A> where A : notnull where T : unmanaged
+/// <summary>
+/// Serializes an array by copying the underlying memory verbatim.
+/// The element type <typeparamref name="T"/> must be blittable.
+/// </summary>
+/// <typeparam name="T">The element type of the array.</typeparam>
+/// <typeparam name="A">The array type itself.</typeparam>
+internal class BlitArrayFormatter<T, A> : ArrayFormatterBase<T, A> where A : notnull where T : unmanaged
 {
-    public UnmanagedArrayFormatter()
+    public BlitArrayFormatter()
     {
-        // todo: assert that T is ACTUALLY blittable (i.e. unmanaged, no booleans, little endian)
-        // tbh would also want to check that the fields are publicly constructible:
-        // i.e. this should be an optimization for DynamicFormatter and not enable serialization of additional types.
     }
 
     /// <inheritdoc/>

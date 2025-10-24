@@ -31,3 +31,49 @@ internal sealed class PolymorphicFormatter<T> : IFormatter<T> where T : notnull
         throw new NotImplementedException();
     }
 }
+
+internal abstract class PolymorphicFormatterBase
+{
+    protected abstract object Deserialize(BufferReader reader);
+    protected abstract void Serialize(BufferWriter writer, object value);
+}
+
+internal sealed class PolymorphicFormatter1<T> : PolymorphicFormatterBase where T : class
+{
+    private readonly IFormatter<T> _inner;
+
+    protected override object Deserialize(BufferReader reader)
+    {
+        ref var value = ref reader.Context.AddClass<T>();
+        _inner.Deserialize(reader, out value);
+        if (value is null)
+        {
+            throw new Exception("Expected non-null value from deserialization");
+        }
+        return value;
+    }
+
+    protected override void Serialize(BufferWriter writer, object value)
+    {
+        writer.Context.RecordReference(value);
+        _inner.Serialize(writer, (T)value);
+    }
+}
+
+internal sealed class PolymorphicFormatter2<T> : PolymorphicFormatterBase where T : struct
+{
+    private readonly IFormatter<T> _inner;
+
+    protected override object Deserialize(BufferReader reader)
+    {
+        ref var value = ref reader.Context.AddBoxedValueType<T>();
+        _inner.Deserialize(reader, out value);
+        throw new NotImplementedException("now get the damn thing as an object...");
+    }
+
+    protected override void Serialize(BufferWriter writer, object value)
+    {
+        writer.Context.RecordReference(value);
+        _inner.Serialize(writer, (T)value);
+    }
+}

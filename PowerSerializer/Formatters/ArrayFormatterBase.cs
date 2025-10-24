@@ -4,8 +4,20 @@ using System.Runtime.InteropServices;
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
 
+/// <summary>
+/// Implements base functionality for array serialization - namely, the encoding/decoding of array lengths and bounds.
+/// </summary>
+/// <typeparam name="T">The element type of the array.</typeparam>
+/// <typeparam name="A">The array type itself.</typeparam>
 internal abstract class ArrayFormatterBase<T, A> : IFormatter<A> where A : notnull
 {
+    /// <summary>
+    /// Constructs a new array formatter.
+    /// </summary>
+    /// <exception cref="ArgumentException">
+    /// If <typeparamref name="A"/> is not an array or <typeparamref name="T"/> is not its element type.
+    /// These invariants are checked at runtime, because they are impossible to encode in C#'s type system.
+    /// </exception>
     public ArrayFormatterBase()
     {
         if (!typeof(A).IsArray)

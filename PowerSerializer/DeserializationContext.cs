@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace DouglasDwyer.PowerSerializer;
 
@@ -10,41 +12,65 @@ internal class DeserializationContext : IResettable
 {
     public static readonly DefaultObjectPool<DeserializationContext> Pool = new DefaultObjectPool<DeserializationContext>(new DefaultPooledObjectPolicy<DeserializationContext>());
 
-    private readonly IRefBox? _newReference;
-
     /// <summary>
     /// A map from integer IDs to the associated objects.
     /// </summary>
-    private readonly List<object> _references;
+    private readonly List<object?> _references;
 
     public DeserializationContext()
     {
-        _references = new List<object>();
+        _references = new List<object?>();
     }
 
-    public ref T AddBoxedValueType<T>() where T : struct
+    public ref object? AddObject()
     {
-        if (typeof(T).GetCustomAttribute<IsReadOnlyAttribute>() is null)
+        CheckReferencesAssigned();
+        var index = _references.Count;
+        _references.Add(null);
+        return ref CollectionsMarshal.AsSpan(_references)[index];
+    }
+
+    /// <summary>
+    /// Gets a reference to the previously-added object at <paramref name="index"/>.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidDataException">
+    /// If the index was out-of-range.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// If the object reference was not properly assigned.
+    /// </exception>
+    public object GetExistingObject(uint index)
+    {
+        CheckReferencesAssigned();
+        if (index < _references.Count)
         {
-            object result = default(T)!;
-            _references.Add(result);
-            return ref Unsafe.Unbox<T>(result);
+            return _references[(int)index];
         }
         else
         {
-            // todo: same as class
-            throw new NotImplementedException();
+            throw new InvalidDataException("Invalid reference ID in deserialization data");
         }
     }
 
-    public ref T? AddClass<T>() where T : class
+    /// <summary>
+    /// Checks that all existing object references have been assigned.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// If the object still <c>null</c> when it was committed.
+    /// </exception>
+    private void CheckReferencesAssigned()
     {
-        throw new NotImplementedException();
-    }
-
-    public T GetExistingObject<T>(uint id) where T : class
-    {
-        throw new NotImplementedException();
+        if (0 < _references.Count)
+        {
+            if (_references[_references.Count - 1] is null)
+            {
+                throw new InvalidOperationException("Attempted to deserialize a child reference before initializing the parent. "
+                    + "The `out T? value` argument of IFormatter<T>.Deserialize must be written before deserializing other references. "
+                    + "Otherwise, cyclic reference resolution would not work.");
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -61,56 +87,4 @@ internal class DeserializationContext : IResettable
         _references.Clear();
         return true;
     }
-
-    /// <summary>
-    /// Provides a mutable memory location for which a <c>ref</c> can be created,
-    /// while also allowing access as an <see cref="object"/>.
-    /// This allows for strongly-typed reference deserialization.
-    /// </summary>
-    private sealed class RefBox<T>
-    {
-        /// <summary>
-        /// Gets the object reference.
-        /// </summary>
-        object? Value { get; }
-    }
-
-    /*
-    public abstract class RefBox<T>
-    {
-        public abstract object GetObject();
-        public abstract ref T GetRef();
-    }
-
-    // Only used for mutable value types
-    public sealed class MutableRefBox<T> : RefBox<T> where T : struct
-    {
-        private readonly object _value;
-
-        public MutableRefBox()
-        {
-            if (typeof(T).GetCustomAttribute<IsReadOnlyAttribute>() is not null)
-            {
-                throw new ArgumentException("Creating refs to readonly value types is not allowed", nameof(T));
-            }
-
-            _value = new T();
-        }
-
-        public override object GetObject() => _value;
-
-        public override ref T GetRef() => ref Unsafe.Unbox<T>(_value);
-    }
-
-    // Used for reference types and readonly value types
-    public sealed class CopyRefBox<T> : RefBox<T> where T : notnull
-    {
-        private T? _value;
-
-
-
-        public override object GetObject() => _value;
-
-        public override ref T GetRef() => ref _value;
-    }*/
 }

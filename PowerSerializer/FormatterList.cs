@@ -116,7 +116,7 @@ public sealed class FormatterList
         /// </summary>
         public required Type FormatterType;
 
-        public void Construct(object target, PowerSerializer serializer)
+        public object Construct(PowerSerializer serializer)
         {
             throw new NotImplementedException();
         }

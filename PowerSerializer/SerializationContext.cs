@@ -17,20 +17,26 @@ internal sealed class SerializationContext : IResettable
         _references = new Dictionary<object, uint>(ReferenceEqualityComparer.Instance);
     }
 
-    public Reference RecordReference(object? obj)
+    /// <summary>
+    /// Assigns a reference ID to the given object, or returns an existing
+    /// ID if the object was already seen.
+    /// </summary>
+    /// <param name="obj">The object to add.</param>
+    /// <returns>An ID associated with the object.</returns>
+    public ReferenceId AddOrGetReference(object? obj)
     {
         if (obj is null)
         {
-            return Reference.Null;
+            return ReferenceId.Null;
         }
         else if (_references.TryGetValue(obj, out var id))
         {
-            return Reference.Existing(id);
+            return ReferenceId.Existing(id);
         }
         else
         {
             _references.Add(obj, (uint)_references.Count);
-            return Reference.New;
+            return ReferenceId.New;
         }
     }
 

@@ -109,14 +109,11 @@ internal abstract class ArrayFormatterBase<T, A> : IFormatter<A> where A : notnu
     /// <exception cref="ArgumentException">If the array did not have concrete type <c>A</c>.</exception>
     private Span<T> GetSpan(Array value)
     {
-        unsafe
+        if (value.GetType() != typeof(A))
         {
-            if (value.GetType() != typeof(A))
-            {
-                throw new ArgumentException("Cannot get span for covariant array value", nameof(value));
-            }
-
-            return new Span<T>(Unsafe.AsPointer(ref MemoryMarshal.GetArrayDataReference(value)), value.Length);
+            throw new ArgumentException("Cannot get span for covariant array value", nameof(value));
         }
+
+        return MemoryMarshal.CreateSpan(ref Unsafe.As<byte, T>(ref MemoryMarshal.GetArrayDataReference(value)), value.Length);
     }
 }

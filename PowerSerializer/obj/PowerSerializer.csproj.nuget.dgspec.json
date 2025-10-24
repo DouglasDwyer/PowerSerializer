@@ -49,13 +49,13 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
-            "Microsoft.Extensions.ObjectPool": {
-              "target": "Package",
-              "version": "[9.0.10, )"
-            },
             "System.Collections.Immutable": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "System.IO.Hashing": {
+              "target": "Package",
+              "version": "[9.0.10, )"
             }
           },
           "imports": [

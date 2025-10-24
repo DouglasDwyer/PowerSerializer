@@ -1,5 +1,4 @@
 ﻿using DouglasDwyer.PowerSerializer.Formatters;
-using Microsoft.Extensions.ObjectPool;
 using System;
 using System.Buffers;
 using System.Reflection;

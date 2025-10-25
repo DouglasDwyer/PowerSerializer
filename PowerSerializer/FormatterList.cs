@@ -16,8 +16,8 @@ public sealed class FormatterList
         .With(typeof(AttributeSpecifiedFormatter<>), typeof(DefaultFormatterAttribute))
         .With(typeof(ArrayFormatter<>))
         .With(typeof(AssemblyFormatter))
-        .With(typeof(BlitArrayFormatter<>))
-        .With(typeof(BlitFormatter<>))
+        //.With(typeof(BlitArrayFormatter<>))
+        //.With(typeof(BlitFormatter<>))
         .With(typeof(PrimitiveFormatter))
         .With(typeof(TypeFormatter));
 

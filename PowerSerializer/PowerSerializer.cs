@@ -27,43 +27,16 @@ public sealed class PowerSerializer
 
     private readonly FormatterList _formatterList;
 
-    private readonly ConditionalWeakTable<Type, PolymorphicDispatcher> _dispatchers;
+    private readonly ConditionalWeakTable<Type, ContentFormatters> _contentFormatters;
 
-    /// <summary>
-    /// Locked when the serializer is generating new formatters.
-    /// </summary>
-    private readonly object _formatterLocker;
-
-    /// <summary>
-    /// This helps to support <b>formatters</b> that require cyclic references to themselves.
-    /// Whenever a value formatter is created, if a <see cref="SealedReferenceFormatter{T}"/> is recursively
-    /// requested for it, it is added here. The reference formatter will be initialized <b>after</b>
-    /// the value formatter.
-    /// </summary>
-    private readonly Dictionary<Type, ISealedReferenceFormatter?> _incompleteReferenceFormatters;
-
-    /// <summary>
-    /// The <see cref="SealedReferenceFormatter{T}"/> or <see cref="PolymorphicReferenceFormatter{T}"/>
-    /// for a C# reference type.
-    /// </summary>
-    private readonly Dictionary<Type, object> _referenceformatters;
-
-    /// <summary>
-    /// The "original" formatter for a type. Defines how to serialize/deserialize the object
-    /// contents (i.e. the object's value). This list stores both formatters for both
-    /// C# reference and value types, though.
-    /// </summary>
-    private readonly Dictionary<Type, object> _valueFormatters;
+    private readonly ConditionalWeakTable<Type, object> _referenceFormatters;
 
     public PowerSerializer(PowerSerializerOptions options)
     {
         _formatterList = FormatterList.Default;  // todo
-        _formatterLocker = new object();
-        _dispatchers = new ConditionalWeakTable<Type, PolymorphicDispatcher>();
-        _incompleteReferenceFormatters = new Dictionary<Type, ISealedReferenceFormatter?>();
+        _referenceFormatters = new ConditionalWeakTable<Type, object>();
+        _contentFormatters = new ConditionalWeakTable<Type, ContentFormatters>();
         Options = options;
-        _referenceformatters = new Dictionary<Type, object>();
-        _valueFormatters = new Dictionary<Type, object>();
     }
 
     /// <inheritdoc cref="Serialize{T}(IBufferWriter{byte}, in T)"/>
@@ -167,11 +140,11 @@ public sealed class PowerSerializer
     {
         if (typeof(T).IsValueType)
         {
-            return (IFormatter<T?>)GetValueFormatter(typeof(T));
+            return (IFormatter<T?>)_contentFormatters.GetValue(typeof(T), CreateContentFormatters).ContentFormatter;
         }
         else
         {
-            return (IFormatter<T?>)GetReferenceFormatter(typeof(T));
+            return (IFormatter<T?>)_referenceFormatters.GetValue(typeof(T), CreateReferenceFormatter);
         }
     }
 
@@ -183,98 +156,22 @@ public sealed class PowerSerializer
     /// <returns>
     /// A dispatcher that can be used to serialize and deserialize it.
     /// </returns>
-    internal PolymorphicDispatcher GetPolymorphicDispatcher(Type type)
+    internal IFormatter<object> GetPolymorphicDispatcher(Type type)
     {
-        return _dispatchers.GetValue(type, CreatePolymorphicDispatcher);
+        return _contentFormatters.GetValue(type, CreateContentFormatters).PolymorphicDispatcher;
     }
 
-    private object GetReferenceFormatter(Type type)
+
+    private ContentFormatters CreateContentFormatters(Type type)
     {
-        lock (_formatterLocker)
-        {
-            if (_referenceformatters.TryGetValue(type, out var formatter))
-            {
-                return formatter;
-            }
-
-            if (IsPolymorphic(type))
-            {
-                var newFormatter = Activator.CreateInstance(typeof(PolymorphicReferenceFormatter<>).MakeGenericType(type), [this])!;
-                _referenceformatters.Add(type, newFormatter);
-                return newFormatter;
-            }
-            else
-            {
-                ref var incompleteFormatter = ref CollectionsMarshal.GetValueRefOrNullRef(_incompleteReferenceFormatters, type);
-
-                if (Unsafe.IsNullRef(ref incompleteFormatter))
-                {
-                    var valueFormatter = GetValueFormatter(type);
-
-                    // After generating value formatter, check again
-                    // The sealed reference formatter may have been recursively generated
-                    if (_referenceformatters.TryGetValue(type, out formatter))
-                    {
-                        return formatter;
-                    }
-                    else
-                    {
-                        var newFormatter = (ISealedReferenceFormatter)Activator.CreateInstance(
-                            typeof(SealedReferenceFormatter<>).MakeGenericType(type))!;
-                        newFormatter.SetValueFormatter(valueFormatter);
-                        return newFormatter;
-                    }
-                }
-                else
-                {
-                    // Register incomplete formatter to be filled when the value
-                    // formatter is fully generated
-                    if (incompleteFormatter is null)
-                    {
-                        incompleteFormatter = (ISealedReferenceFormatter)Activator.CreateInstance(
-                            typeof(SealedReferenceFormatter<>).MakeGenericType(type))!;
-                    }
-
-                    return incompleteFormatter;
-                }
-            }
-        }
+        var contentFormatter = CreateFormatterMethod.MakeGenericMethod(type).Invoke(this, null)!;
+        var polymorphicDispatcher = PolymorphicDispatcher.Create(type, contentFormatter);
+        return new ContentFormatters { ContentFormatter = contentFormatter, PolymorphicDispatcher = polymorphicDispatcher };
     }
 
-    private object GetValueFormatter(Type type)
+    private object CreateReferenceFormatter(Type type)
     {
-        lock (_formatterLocker)
-        {
-            if (_valueFormatters.TryGetValue(type, out var formatter))
-            {
-                return formatter;
-            }
-
-            _incompleteReferenceFormatters.Add(type, null);
-
-            formatter = CreateFormatterMethod.MakeGenericMethod(type).Invoke(this, null)!;
-            _valueFormatters.Add(type, formatter);
-
-            if (_incompleteReferenceFormatters.Remove(type, out var referenceFormatter))
-            {
-                referenceFormatter?.SetValueFormatter(formatter);
-            }
-
-            return formatter;
-        }
-    }
-
-    /// <summary>
-    /// Creates the polymorphic dispatcher to use when serializing/deserializing
-    /// objects whose true type is <paramref name="type"/>.
-    /// </summary>
-    /// <param name="type">The actual, concrete object type.</param>
-    /// <returns>
-    /// The dispatcher that was generated.
-    /// </returns>
-    private PolymorphicDispatcher CreatePolymorphicDispatcher(Type type)
-    {
-        return PolymorphicDispatcher.Create(type, GetValueFormatter(type));
+        return Activator.CreateInstance(typeof(ReferenceFormatter<>).MakeGenericType(type), [this])!;
     }
 
     private IFormatter<T?> CreateFormatter<T>()
@@ -321,16 +218,9 @@ public sealed class PowerSerializer
         throw new MissingFormatterException(typeof(T));
     }
 
-    /// <summary>
-    /// Determines whether references to objects of <paramref name="type"/>
-    /// require the <see cref="PolymorphicReferenceFormatter{T}"/>.
-    /// </summary>
-    /// <param name="type">The type in question.</param>
-    /// <returns></returns>
-    private static bool IsPolymorphic(Type type)
+    private class ContentFormatters
     {
-        return (!type.IsSealed || type.IsArray)
-            && !type.IsAssignableTo(typeof(Assembly))
-            && !(type != typeof(MemberInfo) && type.IsAssignableTo(typeof(MemberInfo)));
+        public required object ContentFormatter;
+        public required IFormatter<object> PolymorphicDispatcher;
     }
 }

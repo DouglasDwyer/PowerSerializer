@@ -14,7 +14,8 @@ public sealed class PrimitiveFormatter :
     IFormatter<long>,
     IFormatter<bool>,
     IFormatter<char>,
-    IFormatter<string>
+    IFormatter<string>,
+    IFormatter<object>
 
 {
     /// <inheritdoc/>
@@ -94,4 +95,10 @@ public sealed class PrimitiveFormatter :
 
     /// <inheritdoc/>
     public void Serialize(BufferWriter writer, in string value) => writer.WriteString(value);
+
+    /// <inheritdoc/>
+    public void Serialize(BufferWriter writer, in object value) { }
+
+    /// <inheritdoc/>
+    public void Deserialize(BufferReader reader, out object value) => value = new object();
 }

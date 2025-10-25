@@ -12,18 +12,18 @@ namespace DouglasDwyer.PowerSerializer;
 internal static class PolymorphicDispatcher
 {
     /// <summary>
-    /// Creates a dispatcher for serializing instances of <paramref name="type"/> using <paramref name="valueFormatter"/>.
+    /// Creates a dispatcher for serializing instances of <paramref name="type"/> using <paramref name="contentFormatter"/>.
     /// </summary>
     /// <param name="type">The concrete type being serialized.</param>
-    /// <param name="valueFormatter">
+    /// <param name="contentFormatter">
     /// A formatter that determines how to serialize the value contents of <paramref name="type"/>.
     /// </param>
     /// <returns>
     /// A dispatcher that can be used to serialize <paramref name="type"/> in polymorphic scenarios.
     /// </returns>
-    public static PolymorphicDispatcher Create(Type type, object valueFormatter)
+    public static IFormatter<object> Create(Type type, object contentFormatter)
     {
-        return (PolymorphicDispatcher)Activator.CreateInstance(HandlerTypeFor(type), valueFormatter)!;
+        return (IFormatter<object>)Activator.CreateInstance(HandlerTypeFor(type), contentFormatter)!;
     }
 
     /// <summary>
@@ -57,42 +57,41 @@ internal static class PolymorphicDispatcher
     private sealed class ClassDispatcher<T> : IFormatter<object> where T : class
     {
         /// <summary>
-        /// The formatter to use when encoding object contents.
+        /// The formatter to use when encoding actual object values.
         /// </summary>
-        private readonly IFormatter<T> _valueFormatter;
+        private readonly IFormatter<T> _contentFormatter;
 
         /// <summary>
         /// Creates a new handler object.
         /// </summary>
-        /// <param name="valueFormatter">
-        /// The formatter to use when encoding object contents.
+        /// <param name="contentFormatter">
+        /// The formatter to use when encoding actual object values.
         /// </param>
-        public ClassDispatcher(IFormatter<T> valueFormatter)
+        public ClassDispatcher(IFormatter<T> contentFormatter)
         {
-            _valueFormatter = valueFormatter;
+            _contentFormatter = contentFormatter;
         }
 
         /// <inheritdoc/>
-        public override void Deserialize(BufferReader reader, out object value)
+        public void Deserialize(BufferReader reader, out object value)
         {
             value = null!;
+
             // Safety: result starts off as null and is only read/written by the deserializer,
             // so this cast does not expose type variance.
-            ref var derivedResult = ref Unsafe.As<object?, T?>(ref value);
-            _valueFormatter.Deserialize(reader, out derivedResult);
+            ref var derivedResult = ref Unsafe.As<object, T?>(ref value);
+            _contentFormatter.Deserialize(reader, out derivedResult);
 
-            if (result is null)
+            if (derivedResult is null)
             {
                 throw new InvalidDataException("Expected non-null object, but deserializer did not initialize output value");
             }
-
-            return result;
         }
 
         /// <inheritdoc/>
-        public override void Serialize(BufferWriter writer, object value)
+        public void Serialize(BufferWriter writer, in object value)
         {
-            _valueFormatter.Serialize(writer, (T)value);
+            _contentFormatter.Serialize(writer, (T)value);
         }
     }
 
@@ -100,42 +99,40 @@ internal static class PolymorphicDispatcher
     /// Serializes boxed <c>struct</c> types.
     /// </summary>
     /// <typeparam name="T">The concrete type being serialized.</typeparam>
-    private sealed class MutableStructDispatcher<T> : PolymorphicDispatcher where T : struct
+    private sealed class MutableStructDispatcher<T> : IFormatter<object> where T : struct
     {
         /// <summary>
-        /// The formatter to use when encoding object contents.
+        /// The formatter to use when encoding actual object values.
         /// </summary>
-        private readonly IFormatter<T> _valueFormatter;
+        private readonly IFormatter<T> _contentFormatter;
 
         /// <summary>
         /// Creates a new handler object.
         /// </summary>
-        /// <param name="valueFormatter">
-        /// The formatter to use when encoding object contents.
+        /// <param name="contentFormatter">
+        /// The formatter to use when encoding actual object values.
         /// </param>
-        public MutableStructDispatcher(IFormatter<T> valueFormatter)
+        public MutableStructDispatcher(IFormatter<T> contentFormatter)
         {
             if (typeof(T).GetCustomAttribute<IsReadOnlyAttribute>() is not null)
             {
                 throw new ArgumentException("readonly structs cannot be serialized by MutableStructHandler", nameof(T));
             }
 
-            _valueFormatter = valueFormatter;
+            _contentFormatter = contentFormatter;
         }
         
         /// <inheritdoc/>
-        public override object RegisterObjectAndDeserialize(BufferReader reader)
+        public void Deserialize(BufferReader reader, out object value)
         {
-            object result = default(T)!;
-            reader.Context.AllocateReference() = result;
-            _valueFormatter.Deserialize(reader, out Unsafe.Unbox<T>(result));
-            return result;
+            value = default(T)!;
+            _contentFormatter.Deserialize(reader, out Unsafe.Unbox<T>(value));
         }
 
         /// <inheritdoc/>
-        public override void SerializeValue(BufferWriter writer, object value)
+        public void Serialize(BufferWriter writer, in object value)
         {
-            _valueFormatter.Serialize(writer, (T)value);
+            _contentFormatter.Serialize(writer, (T)value);
         }
     }
 
@@ -143,44 +140,42 @@ internal static class PolymorphicDispatcher
     /// Serializes boxed <c>readonly struct</c> types.
     /// </summary>
     /// <typeparam name="T">The concrete type being serialized.</typeparam>
-    private sealed class ReadonlyStructDispatcher<T> : PolymorphicDispatcher where T : struct
+    private sealed class ReadonlyStructDispatcher<T> : IFormatter<object> where T : struct
     {
         /// <summary>
-        /// The formatter to use when encoding object contents.
+        /// The formatter to use when encoding actual object values.
         /// </summary>
-        private readonly IFormatter<T> _valueFormatter;
+        private readonly IFormatter<T> _contentFormatter;
 
         /// <summary>
         /// Creates a new handler object.
         /// </summary>
-        /// <param name="valueFormatter">
-        /// The formatter to use when encoding object contents.
+        /// <param name="contentFormatter">
+        /// The formatter to use when encoding actual object values.
         /// </param>
-        public ReadonlyStructDispatcher(IFormatter<T> valueFormatter)
+        public ReadonlyStructDispatcher(IFormatter<T> contentFormatter)
         {
             if (typeof(T).GetCustomAttribute<IsReadOnlyAttribute>() is null)
             {
                 throw new ArgumentException("Mutable structs cannot be serialized by MutableStructHandler", nameof(T));
             }
 
-            _valueFormatter = valueFormatter;
+            _contentFormatter = contentFormatter;
         }
 
         /// <inheritdoc/>
-        public override object RegisterObjectAndDeserialize(BufferReader reader)
+        public void Deserialize(BufferReader reader, out object value)
         {
             // Note: it is impossible for readonly structs to contain a cyclic reference.
             // Therefore, it is safe to call deserialize before allocating the boxed object.
-            ref var result = ref reader.Context.AllocateReference();
-            _valueFormatter.Deserialize(reader, out var value);
-            result = value;
-            return result;
+            _contentFormatter.Deserialize(reader, out var result);
+            value = result;
         }
 
         /// <inheritdoc/>
-        public override void SerializeValue(BufferWriter writer, object value)
+        public void Serialize(BufferWriter writer, in object value)
         {
-            _valueFormatter.Serialize(writer, (T)value);
+            _contentFormatter.Serialize(writer, (T)value);
         }
     }
 }

@@ -20,7 +20,8 @@ namespace TestProject
 
             var serializer = new PowerSerializer(options);
 
-            var ppp = new object[] { 1, 2, 3, 4, 5 };
+            var myObj = new object();
+            var ppp = new object[] { 1, "yourmom", myObj, false, new object(), myObj, 4, 5 };
             var ser = serializer.Serialize<object[]>(ppp);
             var deser = serializer.Deserialize<object[]>(ser);
 

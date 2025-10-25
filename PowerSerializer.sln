@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerSerializer", "PowerSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{932C6672-48BA-4B51-A434-77242324A8A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerSerializer.Tests", "PowerSerializer.Tests\PowerSerializer.Tests.csproj", "{A5840A33-F6E3-46F5-93DD-C022FE06138A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{932C6672-48BA-4B51-A434-77242324A8A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{932C6672-48BA-4B51-A434-77242324A8A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{932C6672-48BA-4B51-A434-77242324A8A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5840A33-F6E3-46F5-93DD-C022FE06138A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5840A33-F6E3-46F5-93DD-C022FE06138A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5840A33-F6E3-46F5-93DD-C022FE06138A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5840A33-F6E3-46F5-93DD-C022FE06138A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

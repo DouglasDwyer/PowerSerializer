@@ -31,6 +31,8 @@ public sealed class PowerSerializer
 
     private readonly ConditionalWeakTable<Type, object> _referenceFormatters;
 
+    public PowerSerializer() : this(new PowerSerializerOptions()) { }
+
     public PowerSerializer(PowerSerializerOptions options)
     {
         _formatterList = FormatterList.Default;  // todo

@@ -4,8 +4,14 @@ using System.Collections.Generic;
 
 namespace DouglasDwyer.PowerSerializer;
 
+/// <summary>
+/// Holds shared state during the serialization process.
+/// </summary>
 internal sealed class SerializationContext : IResettable
 {
+    /// <summary>
+    /// A pool for reusing <see cref="SerializationContext"/>s.
+    /// </summary>
     public static readonly DefaultObjectPool<SerializationContext> Pool = new DefaultObjectPool<SerializationContext>(new DefaultPooledObjectPolicy<SerializationContext>());
 
     /// <summary>
@@ -13,6 +19,9 @@ internal sealed class SerializationContext : IResettable
     /// </summary>
     private readonly Dictionary<object, uint> _references;
 
+    /// <summary>
+    /// Initializes a new, empty context.
+    /// </summary>
     public SerializationContext()
     {
         _references = new Dictionary<object, uint>(ReferenceEqualityComparer.Instance);

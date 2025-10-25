@@ -17,6 +17,10 @@ public sealed class TypeFormatter : IFormatter<Type>
     /// </summary>
     private readonly IFormatter<Assembly?> _assemblyFormatter;
 
+    /// <summary>
+    /// A lookup table between types and persistent hashes.
+    /// Used to reduce the binary size for types from <see cref="PowerSerializerOptions.KnownAssemblies"/>.
+    /// </summary>
     private readonly NameMap<Type> _knownTypes;
 
     /// <summary>
@@ -40,8 +44,9 @@ public sealed class TypeFormatter : IFormatter<Type>
     public TypeFormatter(PowerSerializer serializer)
     {
         _assemblyFormatter = serializer.GetFormatter<Assembly>();
-        _knownTypes = new NameMap<Type>(serializer.Options.KnownAssemblies.Where(x => !x.IsDynamic).SelectMany(x => x.GetTypes()),
-            t => $"[{t.Assembly.GetName().Name}]{t.FullName!}");
+        _knownTypes = new NameMap<Type>(
+            serializer.Options.KnownAssemblies.Where(x => !x.IsDynamic).SelectMany(x => x.GetTypes()),
+            PersistentTypeName);
         _methodFormatter = null!;// serializer.GetFormatter<MethodInfo>();
         _typeReferenceFormatter = serializer.GetFormatter<Type>();
     }
@@ -192,7 +197,26 @@ public sealed class TypeFormatter : IFormatter<Type>
         }
     }
 
-    private void ThrowInvalidDataExceptionIfNull<T>([NotNull] T? value, string message) where T : class
+    /// <summary>
+    /// Gets an assembly-qualified name that can be used to identify a type
+    /// across program versions.
+    /// </summary>
+    /// <param name="type">The type in question.</param>
+    /// <returns>A stable name.</returns>
+    private static string PersistentTypeName(Type type)
+    {
+        return $"[{type.Assembly.GetName().Name}]{type.FullName!}";
+    }
+
+    /// <summary>
+    /// If <paramref name="value"/> is null, then throws an exception.
+    /// </summary>
+    /// <param name="value">The object to check.</param>
+    /// <param name="message">A message to include in the exception.</param>
+    /// <exception cref="InvalidDataException">
+    /// The exception that will be thrown.
+    /// </exception>
+    private void ThrowInvalidDataExceptionIfNull([NotNull] object? value, string message)
     {
         if (value is null)
         {

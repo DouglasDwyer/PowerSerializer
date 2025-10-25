@@ -5,8 +5,14 @@ using System.IO;
 
 namespace DouglasDwyer.PowerSerializer;
 
+/// <summary>
+/// Holds shared state during the deserialization process.
+/// </summary>
 internal class DeserializationContext : IResettable
 {
+    /// <summary>
+    /// A pool for reusing <see cref="DeserializationContext"/>s.
+    /// </summary>
     public static readonly DefaultObjectPool<DeserializationContext> Pool = new DefaultObjectPool<DeserializationContext>(new DefaultPooledObjectPolicy<DeserializationContext>());
 
     /// <summary>
@@ -14,6 +20,9 @@ internal class DeserializationContext : IResettable
     /// </summary>
     private readonly ObjectRefList _references;
 
+    /// <summary>
+    /// Initializes a new, empty context.
+    /// </summary>
     public DeserializationContext()
     {
         _references = new ObjectRefList();

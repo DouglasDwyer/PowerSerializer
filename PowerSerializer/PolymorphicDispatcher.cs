@@ -9,28 +9,8 @@ namespace DouglasDwyer.PowerSerializer;
 /// A type-erased holder for an <see cref="IFormatter{T}"/>.
 /// This is used to upcast/downcast with serialization of polymorphic types.
 /// </summary>
-internal abstract class PolymorphicDispatcher
+internal static class PolymorphicDispatcher
 {
-    /// <summary>
-    /// Deserializes the contents of <paramref name="reader"/> into a new object,
-    /// recording the object reference in the reader's context.
-    /// </summary>
-    /// <param name="reader">
-    /// The input buffer.
-    /// </param>
-    /// <returns>
-    /// The object that was deserialized.
-    /// </returns>
-    public abstract object RegisterObjectAndDeserialize(BufferReader reader);
-
-    /// <summary>
-    /// Serializes the contents of <paramref name="value"/> to the output buffer.
-    /// No casting or reference recording is performed.
-    /// </summary>
-    /// <param name="writer">The output buffer.</param>
-    /// <param name="value">The value to record.</param>
-    public abstract void SerializeValue(BufferWriter writer, object value);
-
     /// <summary>
     /// Creates a dispatcher for serializing instances of <paramref name="type"/> using <paramref name="valueFormatter"/>.
     /// </summary>
@@ -74,7 +54,7 @@ internal abstract class PolymorphicDispatcher
     /// Serializes <c>class</c> types.
     /// </summary>
     /// <typeparam name="T">The concrete type being serialized.</typeparam>
-    private sealed class ClassDispatcher<T> : PolymorphicDispatcher where T : class
+    private sealed class ClassDispatcher<T> : IFormatter<object> where T : class
     {
         /// <summary>
         /// The formatter to use when encoding object contents.
@@ -93,13 +73,12 @@ internal abstract class PolymorphicDispatcher
         }
 
         /// <inheritdoc/>
-        public override object RegisterObjectAndDeserialize(BufferReader reader)
+        public override void Deserialize(BufferReader reader, out object value)
         {
-            ref var result = ref reader.Context.AllocateReference();
-
+            value = null!;
             // Safety: result starts off as null and is only read/written by the deserializer,
             // so this cast does not expose type variance.
-            ref var derivedResult = ref Unsafe.As<object?, T?>(ref result);
+            ref var derivedResult = ref Unsafe.As<object?, T?>(ref value);
             _valueFormatter.Deserialize(reader, out derivedResult);
 
             if (result is null)
@@ -111,7 +90,7 @@ internal abstract class PolymorphicDispatcher
         }
 
         /// <inheritdoc/>
-        public override void SerializeValue(BufferWriter writer, object value)
+        public override void Serialize(BufferWriter writer, object value)
         {
             _valueFormatter.Serialize(writer, (T)value);
         }
@@ -167,12 +146,6 @@ internal abstract class PolymorphicDispatcher
     private sealed class ReadonlyStructDispatcher<T> : PolymorphicDispatcher where T : struct
     {
         /// <summary>
-        /// A temporary object to store during deserialization so that the <see cref="DeserializationContext"/>
-        /// thinks the boxed object is initialized.
-        /// </summary>
-        private readonly object _proxy;
-
-        /// <summary>
         /// The formatter to use when encoding object contents.
         /// </summary>
         private readonly IFormatter<T> _valueFormatter;
@@ -190,7 +163,6 @@ internal abstract class PolymorphicDispatcher
                 throw new ArgumentException("Mutable structs cannot be serialized by MutableStructHandler", nameof(T));
             }
 
-            _proxy = new object();
             _valueFormatter = valueFormatter;
         }
 
@@ -198,10 +170,8 @@ internal abstract class PolymorphicDispatcher
         public override object RegisterObjectAndDeserialize(BufferReader reader)
         {
             // Note: it is impossible for readonly structs to contain a cyclic reference.
-            // Therefore, it is safe to call deserialize before allocating the boxed object,
-            // as long as we provide a proxy in the meantime.
+            // Therefore, it is safe to call deserialize before allocating the boxed object.
             ref var result = ref reader.Context.AllocateReference();
-            result = _proxy;
             _valueFormatter.Deserialize(reader, out var value);
             result = value;
             return result;

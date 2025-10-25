@@ -115,10 +115,5 @@ public sealed class FormatterList
         /// The type of the formatter.
         /// </summary>
         public required Type FormatterType;
-
-        public object Construct(PowerSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

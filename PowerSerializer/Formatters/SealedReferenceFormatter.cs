@@ -11,22 +11,17 @@ namespace DouglasDwyer.PowerSerializer.Formatters;
 /// <typeparam name="T">
 /// The concrete type to serialize.
 /// </typeparam>
-internal sealed class SealedReferenceFormatter<T> : ReferenceFormatterBase<T> where T : class
+internal sealed class SealedReferenceFormatter<T> : ReferenceFormatterBase<T>, ISealedReferenceFormatter where T : class
 {
     /// <summary>
     /// The formatter to use when serializing the actual object contents.
     /// </summary>
-    private readonly IFormatter<T> _valueFormatter;
+    private IFormatter<T>? _valueFormatter;
 
-    /// <summary>
-    /// Creates a new formatter.
-    /// </summary>
-    /// <param name="valueFormatter">
-    /// The formatter to use when serializing the actual object contents.
-    /// </param>
-    public SealedReferenceFormatter(IFormatter<T> valueFormatter)
+    /// <inheritdoc/>
+    public void SetValueFormatter(object formatter)
     {
-        _valueFormatter = valueFormatter;
+        _valueFormatter = (IFormatter<T>)formatter;
     }
 
     /// <inheritdoc/>
@@ -37,7 +32,7 @@ internal sealed class SealedReferenceFormatter<T> : ReferenceFormatterBase<T> wh
         // Safety: result starts off as null and is only read/written by the deserializer,
         // so this cast does not expose type variance.
         ref var derivedResult = ref Unsafe.As<object?, T?>(ref result);
-        _valueFormatter.Deserialize(reader, out derivedResult);
+        _valueFormatter!.Deserialize(reader, out derivedResult);
 
         if (result is null)
         {
@@ -50,6 +45,6 @@ internal sealed class SealedReferenceFormatter<T> : ReferenceFormatterBase<T> wh
     /// <inheritdoc/>
     protected override void SerializeValue(BufferWriter writer, T value)
     {
-        _valueFormatter.Serialize(writer, value);
+        _valueFormatter!.Serialize(writer, value);
     }
 }

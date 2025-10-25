@@ -51,6 +51,8 @@ internal sealed class PolymorphicReferenceFormatter<T> : ReferenceFormatterBase<
     /// <inheritdoc/>
     protected override void SerializeValue(BufferWriter writer, T value)
     {
-        _serializer.GetPolymorphicDispatcher(value.GetType()).SerializeValue(writer, value);
+        var type = value.GetType();
+        _typeFormatter.Serialize(writer, type);
+        _serializer.GetPolymorphicDispatcher(type).SerializeValue(writer, value);
     }
 }

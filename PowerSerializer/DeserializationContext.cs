@@ -29,7 +29,6 @@ internal class DeserializationContext : IResettable
     /// </returns>
     public ref object? AllocateReference()
     {
-        CheckLastRefAssigned();
         var index = _references.Count;
         _references.Add(null);
         return ref _references[index];
@@ -48,33 +47,23 @@ internal class DeserializationContext : IResettable
     /// </exception>
     public object GetExistingReference(uint index)
     {
-        CheckLastRefAssigned();
         if (index < _references.Count)
         {
-            return _references[(int)index]!;
-        }
-        else
-        {
-            throw new InvalidDataException("Invalid reference ID in deserialization data");
-        }
-    }
-
-    /// <summary>
-    /// Checks that the most recent object reference has been assigned.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">
-    /// If the object still <c>null</c> when it was committed.
-    /// </exception>
-    private void CheckLastRefAssigned()
-    {
-        if (0 < _references.Count)
-        {
-            if (_references[_references.Count - 1] is null)
+            var result = _references[(int)index];
+            if (result is null)
             {
                 throw new InvalidOperationException("Attempted to deserialize a child reference before initializing the parent. "
                     + "The `out T? value` argument of IFormatter<T>.Deserialize must be written before deserializing other references. "
                     + "Otherwise, cyclic reference resolution would not work.");
             }
+            else
+            {
+                return result;
+            }
+        }
+        else
+        {
+            throw new InvalidDataException("Invalid reference ID in deserialization data");
         }
     }
 

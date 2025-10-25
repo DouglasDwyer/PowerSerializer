@@ -87,7 +87,7 @@ internal struct GenericEquation
                 return false;
             }
         }
-        else if (rhs.IsConstructedGenericType && lhs == rhs.GetGenericTypeDefinition())
+        else if (lhs.IsConstructedGenericType && rhs.IsConstructedGenericType && lhs.GetGenericTypeDefinition() == rhs.GetGenericTypeDefinition())
         {
             foreach (var (a, b) in lhs.GetGenericArguments().Zip(rhs.GetGenericArguments()))
             {
@@ -142,6 +142,7 @@ internal struct GenericEquation
                 if (substutiton is null)
                 {
                     substutiton = rhs;
+                    return true;
                 }
                 else if (substutiton != rhs)
                 {

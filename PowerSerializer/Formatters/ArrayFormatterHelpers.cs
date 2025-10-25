@@ -33,12 +33,12 @@ internal static class ArrayFormatterHelpers
             throw new ArgumentException("Expected array type", nameof(A));
         }
 
-        if (concreteFormatterDefinition.GetGenericArguments().Length != 1)
+        if (concreteFormatterDefinition.GetGenericArguments().Length != 2)
         {
-            throw new ArgumentException("Expected concrete formatter type to have one type arguments - the element type");
+            throw new ArgumentException("Expected concrete formatter type to have two type arguments - the element type and the array type itself");
         }
 
-        var concreteFormatterType = concreteFormatterDefinition.MakeGenericType([typeof(A).GetElementType()!]);
+        var concreteFormatterType = concreteFormatterDefinition.MakeGenericType([typeof(A), typeof(A).GetElementType()!]); //todo
 
         if (concreteFormatterType.GetConstructor([typeof(PowerSerializer)]) is null)
         {
@@ -87,26 +87,19 @@ internal static class ArrayFormatterHelpers
             else
             {
                 var lengths = new int[typeof(A).GetArrayRank()];
+                var lowerBounds = new int[typeof(A).GetArrayRank()];
 
                 for (var i = 0; i < typeof(A).GetArrayRank(); i++)
                 {
                     lengths[i] = (int)reader.ReadVarUInt32();
                 }
 
-                if (typeof(A).IsVariableBoundArray)
+                for (var i = 0; i < typeof(A).GetArrayRank(); i++)
                 {
-                    var lowerBounds = new int[typeof(A).GetArrayRank()];
-                    for (var i = 0; i < typeof(A).GetArrayRank(); i++)
-                    {
-                        lowerBounds[i] = (int)reader.ReadVarUInt32();
-                    }
+                    lowerBounds[i] = (int)reader.ReadVarUInt32();
+                }
 
-                    value = (A)(object)Array.CreateInstanceFromArrayType(typeof(A), lengths, lowerBounds);
-                }
-                else
-                {
-                    value = (A)(object)Array.CreateInstanceFromArrayType(typeof(A), lengths);
-                }
+                value = (A)(object)Array.CreateInstanceFromArrayType(typeof(A), lengths, lowerBounds);
             }
 
             DeserializeElements(reader, GetSpan((Array)(object)value));
@@ -122,7 +115,7 @@ internal static class ArrayFormatterHelpers
                 writer.WriteVarUInt32((uint)array.GetLength(i));
             }
 
-            if (typeof(A).IsVariableBoundArray)
+            if (!typeof(A).IsSZArray)
             {
                 for (var i = 0; i < typeof(A).GetArrayRank(); i++)
                 {

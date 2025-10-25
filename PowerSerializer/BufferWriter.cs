@@ -234,7 +234,7 @@ public ref struct BufferWriter
         var bytes = encoding.GetByteCount(value);
         WriteVarUInt32((uint)bytes);
         var buffer = GetSpan(bytes);
-        encoding.GetBytes(value, buffer[sizeof(int)..]);
+        encoding.GetBytes(value, buffer);
         Advance(bytes);
     }
 

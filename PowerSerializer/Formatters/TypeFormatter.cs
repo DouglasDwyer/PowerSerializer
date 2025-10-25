@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -15,6 +16,8 @@ public sealed class TypeFormatter : IFormatter<Type>
     /// Formats assembly references.
     /// </summary>
     private readonly IFormatter<Assembly?> _assemblyFormatter;
+
+    private readonly NameMap<Type> _knownTypes;
 
     /// <summary>
     /// Formats method references. Used when serializing the generic
@@ -37,6 +40,8 @@ public sealed class TypeFormatter : IFormatter<Type>
     public TypeFormatter(PowerSerializer serializer)
     {
         _assemblyFormatter = serializer.GetFormatter<Assembly>();
+        _knownTypes = new NameMap<Type>(serializer.Options.KnownAssemblies.Where(x => !x.IsDynamic).SelectMany(x => x.GetTypes()),
+            t => $"[{t.Assembly.GetName().Name}]{t.FullName!}");
         _methodFormatter = null!;// serializer.GetFormatter<MethodInfo>();
         _typeReferenceFormatter = serializer.GetFormatter<Type>();
     }
@@ -44,76 +49,113 @@ public sealed class TypeFormatter : IFormatter<Type>
     /// <inheritdoc/>
     public void Deserialize(BufferReader reader, out Type value)
     {
-        // todo: handle array
-
-        var kind = (GenericKind)reader.ReadUInt8();
-
-        if (kind == GenericKind.TypeParameter)
+        var metadata = (TypeMetadata)reader.ReadUInt8();
+        switch (metadata.Kind)
         {
-            var position = reader.ReadUInt8();
-            _typeReferenceFormatter.Deserialize(reader, out var parent);
-            value = parent!.GetGenericArguments()[position];
-        }
-        else if (kind == GenericKind.MethodParameter)
-        {
-            var position = reader.ReadUInt8();
-            _methodFormatter.Deserialize(reader, out var parent);
-            value = parent!.GetGenericArguments()[position];
-        }
-        else if (kind == GenericKind.Constructed)
-        {
-            _typeReferenceFormatter.Deserialize(reader, out var definition);
-            ThrowInvalidDataExceptionIfNull(definition, "Generic type was not encoded properly: expected type definition, but got null");
-
-            var typeCount = definition!.GetGenericArguments().Length;  // todo: cache
-            var types = new Type[typeCount];
-
-            for (var i = 0; i < typeCount; i++)
+            case TypeKind.SZArray:
             {
-                _typeReferenceFormatter.Deserialize(reader, out var argument);
-                ThrowInvalidDataExceptionIfNull(argument, "Generic type was not encoded properly: expected type argument, but got null");
-                types[i] = argument;
+                _typeReferenceFormatter.Deserialize(reader, out var element);
+                ThrowInvalidDataExceptionIfNull(element, "Array type was not encoded properly: expected element type, but got null");
+                value = element.MakeArrayType();
+                break;
             }
-
-            value = definition.MakeGenericType(types);
-        }
-        else
-        {
-            var genericCount = kind.Count;
-            var rawName = reader.ReadString(Encoding.ASCII);
-            var fullName = 0 < genericCount ? $"{rawName}`{genericCount}" : rawName;
-
-            _assemblyFormatter.Deserialize(reader, out var assembly);
-            ThrowInvalidDataExceptionIfNull(assembly, "Type was not encoded properly: expected assembly, but got null");
-            var result = assembly.GetType(fullName);
-
-            if (result is null)
+            case TypeKind.Array:
             {
-                throw new TypeLoadException($"Unable to load type {fullName} from {assembly.FullName}");
+                _typeReferenceFormatter.Deserialize(reader, out var element);
+                ThrowInvalidDataExceptionIfNull(element, "Array type was not encoded properly: expected element type, but got null");
+                value = element.MakeArrayType(metadata.Arity);
+                break;
             }
+            case TypeKind.TypeParameter:
+            {
+                var position = reader.ReadUInt8();
+                _typeReferenceFormatter.Deserialize(reader, out var parent);
+                value = parent!.GetGenericArguments()[position];
+                break;
+            }
+            case TypeKind.MethodParameter:
+            {
+                var position = reader.ReadUInt8();
+                _methodFormatter.Deserialize(reader, out var parent);
+                value = parent!.GetGenericArguments()[position];
+                break;
+            }
+            case TypeKind.ConstructedGeneric:
+            {
+                _typeReferenceFormatter.Deserialize(reader, out var definition);
+                ThrowInvalidDataExceptionIfNull(definition, "Generic type was not encoded properly: expected type definition, but got null");
 
-            value = result;
+                var typeCount = definition!.GetGenericArguments().Length;  // todo: cache
+                var types = new Type[typeCount];
+
+                for (var i = 0; i < typeCount; i++)
+                {
+                    _typeReferenceFormatter.Deserialize(reader, out var argument);
+                    ThrowInvalidDataExceptionIfNull(argument, "Generic type was not encoded properly: expected type argument, but got null");
+                    types[i] = argument;
+                }
+
+                value = definition.MakeGenericType(types);
+                break;
+                }
+            case TypeKind.KnownDefinition:
+            {
+                var id = reader.ReadUInt64();
+                if (!_knownTypes.TryGetObject(id, out value!))
+                {
+                    throw new TypeLoadException("Could not find well-known type by hash; an assembly may be missing from the PowerSerializerOptions.KnownAssemblies list");
+                }
+                break;
+            }
+            case TypeKind.Definition:
+            default:
+            {
+                var rawName = reader.ReadString(Encoding.ASCII);
+                var fullName = 0 < metadata.Arity ? $"{rawName}`{metadata.Arity}" : rawName;
+
+                _assemblyFormatter.Deserialize(reader, out var assembly);
+                ThrowInvalidDataExceptionIfNull(assembly, "Type was not encoded properly: expected assembly, but got null");
+                var result = assembly.GetType(fullName);
+
+                if (result is null)
+                {
+                    throw new TypeLoadException($"Unable to load type {fullName} from {assembly.FullName}");
+                }
+
+                value = result;
+                break;
+            }
         }
     }
 
     /// <inheritdoc/>
     public void Serialize(BufferWriter writer, in Type value)
     {
-        if (value.IsGenericTypeParameter)
+        if (value.IsSZArray)
         {
-            writer.WriteUInt8((byte)GenericKind.TypeParameter);
+            writer.WriteUInt8((byte)TypeMetadata.SZArray());
+            _typeReferenceFormatter.Serialize(writer, value.GetElementType());
+        }
+        else if (value.IsArray)
+        {
+            writer.WriteUInt8((byte)TypeMetadata.Array(value.GetArrayRank()));
+            _typeReferenceFormatter.Serialize(writer, value.GetElementType());
+        }
+        else if (value.IsGenericTypeParameter)
+        {
+            writer.WriteUInt8((byte)TypeMetadata.TypeParameter());
             writer.WriteUInt8((byte)value.GenericParameterPosition);
             _typeReferenceFormatter.Serialize(writer, value.DeclaringType);
         }
         else if (value.IsGenericMethodParameter)
         {
-            writer.WriteUInt8((byte)GenericKind.MethodParameter);
+            writer.WriteUInt8((byte)TypeMetadata.MethodParameter());
             writer.WriteUInt8((byte)value.GenericParameterPosition);
             _methodFormatter.Serialize(writer, (MethodInfo)value.DeclaringMethod!);
         }
         else if (value.IsConstructedGenericType)
         {
-            writer.WriteUInt8((byte)GenericKind.Constructed);
+            writer.WriteUInt8((byte)TypeMetadata.ConstructedGeneric());
             _typeReferenceFormatter.Serialize(writer, value.GetGenericTypeDefinition());
 
             foreach (var ty in value.GetGenericArguments())   // todo: cache
@@ -123,18 +165,26 @@ public sealed class TypeFormatter : IFormatter<Type>
         }
         else if (!value.ContainsGenericParameters || value.IsGenericTypeDefinition)
         {
-            var genericCount = 0;
-            var genericDefinition = value;
-
-            if (value.IsGenericTypeDefinition)
+            if (_knownTypes.TryGetId(value, out var id))
             {
-                genericDefinition = value.GetGenericTypeDefinition();
-                genericCount = genericDefinition.GetGenericArguments().Length;  // todo: cache
+                writer.WriteUInt8((byte)TypeMetadata.KnownDefinition());
+                writer.WriteUInt64(id);
             }
+            else
+            {
+                var genericCount = 0;
+                var genericDefinition = value;
 
-            writer.WriteUInt8((byte)GenericKind.Definition(genericCount));
-            writer.WriteString(NamespaceQualifiedName(genericDefinition), Encoding.ASCII);
-            _assemblyFormatter.Serialize(writer, genericDefinition.Assembly);
+                if (value.IsGenericTypeDefinition)
+                {
+                    genericDefinition = value.GetGenericTypeDefinition();
+                    genericCount = genericDefinition.GetGenericArguments().Length;  // todo: cache
+                }
+
+                writer.WriteUInt8((byte)TypeMetadata.Definition(genericCount));
+                writer.WriteString(NamespaceQualifiedName(genericDefinition), Encoding.ASCII);
+                _assemblyFormatter.Serialize(writer, genericDefinition.Assembly);
+            }
         }
         else
         {
@@ -152,8 +202,8 @@ public sealed class TypeFormatter : IFormatter<Type>
 
     private static string NamespaceQualifiedName(Type type)
     {
-        var result = type.Name;
-        var backTickIndex = result.IndexOf("`");
+        var result = string.IsNullOrEmpty(type.Namespace) ? type.Name : $"{type.Namespace}.{type.Name}";
+        var backTickIndex = result.LastIndexOf("`");
         if (0 <= backTickIndex)
         {
             return result[..backTickIndex];
@@ -165,89 +215,178 @@ public sealed class TypeFormatter : IFormatter<Type>
     }
 
     /// <summary>
-    /// Describes what "kind" of generic a type is - whether it is a simple type,
-    /// a generic parameter (such as <c>T</c>), or a generic type with parameters.
+    /// Identifies a specific subset of types.
     /// </summary>
-    private readonly record struct GenericKind
+    private enum TypeKind
     {
         /// <summary>
-        /// The type is a constructed generic with type parameters.
+        /// An array type.
         /// </summary>
-        public static readonly GenericKind Constructed = new GenericKind(253);
+        Array,
 
         /// <summary>
-        /// The type is a stand-in generic parameter (such as <c>T</c>) declared on a method.
+        /// A constructed generic type.
         /// </summary>
-        public static readonly GenericKind MethodParameter = new GenericKind(254);
+        ConstructedGeneric,
 
         /// <summary>
-        /// The type is a stand-in generic parameter (such as <c>T</c>) declared on a type.
+        /// A non-generic type or an open generic type.
         /// </summary>
-        public static readonly GenericKind TypeParameter = new GenericKind(255);
+        Definition,
 
         /// <summary>
-        /// If this represents a generic type <b>definition</b>, gets the number of parameters.
-        /// Otherwise, throws an exception.
+        /// A non-generic or open generic type from one of the <see cref="PowerSerializerOptions.KnownAssemblies"/>.
         /// </summary>
-        public int Count
+        KnownDefinition,
+
+        /// <summary>
+        /// A generic method parameter.
+        /// </summary>
+        MethodParameter,
+
+        /// <summary>
+        /// A 1D array type with a lower bound of zero.
+        /// </summary>
+        SZArray,
+
+        /// <summary>
+        /// A generic type parameter.
+        /// </summary>
+        TypeParameter,
+    }
+
+    /// <summary>
+    /// Records information about a type that is not already encoded in the name.
+    /// This includes the number of generic parameters and array dimensions.
+    /// </summary>
+    private readonly record struct TypeMetadata
+    {
+        /// <summary>
+        /// Describes what sort of type this is.
+        /// </summary>
+        public TypeKind Kind => (TypeKind)(_inner & 0b111);
+
+        /// <summary>
+        /// Gets the arity (if any) associated with the type.
+        /// </summary>
+        public int Arity
         {
             get
             {
-                if (_inner < 253)
+                if (Kind == TypeKind.Definition)
                 {
-                    return _inner;
+                    return _inner >> 3;
+                }
+                else if (Kind == TypeKind.Array)
+                {
+                    return (_inner >> 3) + 1;
                 }
                 else
                 {
-                    throw new InvalidOperationException("Generic kind did not have an associated count");
+                    throw new InvalidOperationException("Type metadata not associated with an arity");
                 }
             }
         }
 
         /// <summary>
-        /// The inner representation of the generic kind.
+        /// The inner representation of the metadata.
         /// </summary>
         private readonly byte _inner;
 
         /// <summary>
-        /// Creates a new kind with the provided representation.
+        /// Creates a new metadata object.
         /// </summary>
-        /// <param name="inner">The inner representation of this type.</param>
-        private GenericKind(byte inner)
+        /// <param name="inner">The inner representation of the metadata.</param>
+        private TypeMetadata(byte inner)
         {
             _inner = inner;
         }
 
         /// <summary>
-        /// Gets a kind representing a generic type definition (or simple type) with <paramref name="count"/> generic parameters.
+        /// Creates a new metadata object.
         /// </summary>
-        /// <param name="count">The generic arity of the type. This may be <c>0</c>.</param>
-        /// <returns>The encoded kind.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// If the number of generic parameters exceeds the maximum representible value.
-        /// </exception>
-        public static GenericKind Definition(int count)
+        /// <param name="kind">The subset to which this type belongs.</param>
+        /// <param name="number">A numeric value associated with the type, used to encode extra properties.</param>
+        private TypeMetadata(TypeKind kind, int number)
         {
-            if (count < 253)
-            {
-                return new GenericKind((byte)count);
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(count), "Exceeded maximum supported number of generic parameters");
-            }
+            _inner = (byte)((byte)kind | (number << 3));
         }
 
         /// <summary>
-        /// Converts a kind to its underlying representation.
+        /// An array type.
         /// </summary>
-        /// <param name="value">The object to convert.</param>
-        public static explicit operator byte(GenericKind value) => value._inner;
+        /// <param name="dimensions">The number of array dimensions.</param>
+        /// <returns>The associated metadata.</returns>
+        public static TypeMetadata Array(int dimensions)
+        {
+            return new TypeMetadata(TypeKind.Array, dimensions - 1);
+        }
 
         /// <summary>
-        /// Gets a kind from its underlying representation.
+        /// A constructed generic type.
+        /// </summary>
+        /// <returns>The associated metadata.</returns>
+        public static TypeMetadata ConstructedGeneric()
+        {
+            return new TypeMetadata(TypeKind.ConstructedGeneric, 0);
+        }
+
+        /// <summary>
+        /// A non-generic type or an open generic type.
+        /// </summary>
+        /// <param name="genericArity">The number of generic arguments.</param>
+        /// <returns>The associated metadata.</returns>
+        public static TypeMetadata Definition(int genericArity)
+        {
+            return new TypeMetadata(TypeKind.Definition, genericArity);
+        }
+
+        /// <summary>
+        /// A non-generic or open generic type from one of the <see cref="PowerSerializerOptions.KnownAssemblies"/>.
+        /// </summary>
+        /// <returns>The associated metadata.</returns>
+        public static TypeMetadata KnownDefinition()
+        {
+            return new TypeMetadata(TypeKind.KnownDefinition, 0);
+        }
+
+        /// <summary>
+        /// A generic method parameter.
+        /// </summary>
+        /// <returns>The associated metadata.</returns>
+        public static TypeMetadata MethodParameter()
+        {
+            return new TypeMetadata(TypeKind.MethodParameter, 0);
+        }
+
+        /// <summary>
+        /// An array type with variable lower bounds.
+        /// </summary>
+        /// <returns>The associated metadata.</returns>
+        public static TypeMetadata SZArray()
+        {
+            return new TypeMetadata(TypeKind.SZArray, 0);
+        }
+
+        /// <summary>
+        /// A generic type parameter.
+        /// </summary>
+        /// <returns>The associated metadata.</returns>
+        public static TypeMetadata TypeParameter()
+        {
+            return new TypeMetadata(TypeKind.TypeParameter, 0);
+        }
+
+        /// <summary>
+        /// Converts the metadata to its underlying representation.
         /// </summary>
         /// <param name="value">The object to convert.</param>
-        public static explicit operator GenericKind(byte value) => new GenericKind(value);
+        public static explicit operator byte(TypeMetadata value) => value._inner;
+
+        /// <summary>
+        /// Gets metadata from its underlying representation.
+        /// </summary>
+        /// <param name="value">The object to convert.</param>
+        public static explicit operator TypeMetadata(byte value) => new TypeMetadata(value);
     }
 }

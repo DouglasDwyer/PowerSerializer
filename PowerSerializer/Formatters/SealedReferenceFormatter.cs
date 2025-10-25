@@ -11,7 +11,7 @@ namespace DouglasDwyer.PowerSerializer.Formatters;
 /// <typeparam name="T">
 /// The concrete type to serialize.
 /// </typeparam>
-internal sealed class SealedReferenceFormatter<T> : IFormatter<T?> where T : class
+internal sealed class SealedReferenceFormatter<T> : ReferenceFormatterBase<T> where T : class
 {
     /// <summary>
     /// The formatter to use when serializing the actual object contents.
@@ -30,43 +30,26 @@ internal sealed class SealedReferenceFormatter<T> : IFormatter<T?> where T : cla
     }
 
     /// <inheritdoc/>
-    public void Deserialize(BufferReader reader, out T? value)
+    protected override T RegisterObjectAndDeserialize(BufferReader reader)
     {
-        var reference = ReferenceId.Read(reader);
-        if (reference == ReferenceId.Null)
-        {
-            value = null;
-        }
-        else if (reference == ReferenceId.New)
-        {
-            ref var result = ref reader.Context.AddObject();
+        ref var result = ref reader.Context.AllocateReference();
 
-            // Safety: result starts off as null and is only read/written by the deserializer,
-            // so this cast does not expose type variance.
-            ref var derivedResult = ref Unsafe.As<object?, T?>(ref result);
-            _valueFormatter.Deserialize(reader, out derivedResult);
+        // Safety: result starts off as null and is only read/written by the deserializer,
+        // so this cast does not expose type variance.
+        ref var derivedResult = ref Unsafe.As<object?, T?>(ref result);
+        _valueFormatter.Deserialize(reader, out derivedResult);
 
-            if (result is null)
-            {
-                throw new InvalidDataException("Expected non-null object, but deserializer did not initialize output value");
-            }
-
-            value = derivedResult;
-        }
-        else
+        if (result is null)
         {
-            value = (T)reader.Context.GetExistingObject(reference.Index);
+            throw new InvalidDataException("Expected non-null object, but deserializer did not initialize output value");
         }
+
+        return derivedResult;
     }
 
     /// <inheritdoc/>
-    public void Serialize(BufferWriter writer, in T? value)
+    protected override void SerializeValue(BufferWriter writer, T value)
     {
-        var reference = writer.Context.AddOrGetReference(value);
-        reference.Write(writer);
-        if (reference == ReferenceId.New)
-        {
-            _valueFormatter.Serialize(writer, value!);
-        }
+        _valueFormatter.Serialize(writer, value);
     }
 }

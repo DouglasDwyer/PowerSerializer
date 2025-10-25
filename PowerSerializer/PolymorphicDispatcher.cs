@@ -95,7 +95,7 @@ internal abstract class PolymorphicDispatcher
         /// <inheritdoc/>
         public override object RegisterObjectAndDeserialize(BufferReader reader)
         {
-            ref var result = ref reader.Context.AddObject();
+            ref var result = ref reader.Context.AllocateReference();
 
             // Safety: result starts off as null and is only read/written by the deserializer,
             // so this cast does not expose type variance.
@@ -148,7 +148,7 @@ internal abstract class PolymorphicDispatcher
         public override object RegisterObjectAndDeserialize(BufferReader reader)
         {
             object result = default(T)!;
-            reader.Context.AddObject() = result;
+            reader.Context.AllocateReference() = result;
             _valueFormatter.Deserialize(reader, out Unsafe.Unbox<T>(result));
             return result;
         }
@@ -200,7 +200,7 @@ internal abstract class PolymorphicDispatcher
             // Note: it is impossible for readonly structs to contain a cyclic reference.
             // Therefore, it is safe to call deserialize before allocating the boxed object,
             // as long as we provide a proxy in the meantime.
-            ref var result = ref reader.Context.AddObject();
+            ref var result = ref reader.Context.AllocateReference();
             result = _proxy;
             _valueFormatter.Deserialize(reader, out var value);
             result = value;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.ObjectPool;
+using System;
 using System.Collections.Generic;
 
 namespace DouglasDwyer.PowerSerializer;
@@ -18,25 +19,36 @@ internal sealed class SerializationContext : IResettable
     }
 
     /// <summary>
-    /// Assigns a reference ID to the given object, or returns an existing
-    /// ID if the object was already seen.
+    /// Assigns an ID to <paramref name="obj"/> based upon order of occurrence.
     /// </summary>
     /// <param name="obj">The object to add.</param>
-    /// <returns>An ID associated with the object.</returns>
-    public ReferenceId AddOrGetReference(object? obj)
+    /// <returns>The ID of the new reference.</returns>
+    /// <exception cref="ArgumentException">
+    /// If <paramref name="obj"/> already had an assigned reference ID.
+    /// </exception>
+    public uint AllocateReference(object obj)
     {
-        if (obj is null)
+        var index = (uint)_references.Count;
+        _references.Add(obj, (uint)_references.Count);
+        return index;
+    }
+
+    /// <summary>
+    /// Gets the reference ID of <paramref name="obj"/>, if it had one.
+    /// </summary>
+    /// <param name="obj">The object in question.</param>
+    /// <returns>
+    /// The associated ID, or <c>null</c> if the object did not have one.
+    /// </returns>
+    public uint? GetExistingReference(object obj)
+    {
+        if (_references.TryGetValue(obj, out var id))
         {
-            return ReferenceId.Null;
-        }
-        else if (_references.TryGetValue(obj, out var id))
-        {
-            return ReferenceId.Existing(id);
+            return id;
         }
         else
         {
-            _references.Add(obj, (uint)_references.Count);
-            return ReferenceId.New;
+            return null;
         }
     }
 

@@ -27,7 +27,7 @@ internal class DeserializationContext : IResettable
     /// A stable <c>ref</c> to the slot. This is initially <c>null</c>.
     /// The <c>ref</c> will remain valid for the duration of serialization.
     /// </returns>
-    public ref object? AddObject()
+    public ref object? AllocateReference()
     {
         CheckLastRefAssigned();
         var index = _references.Count;
@@ -38,15 +38,15 @@ internal class DeserializationContext : IResettable
     /// <summary>
     /// Gets a reference to the previously-added object at <paramref name="index"/>.
     /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
+    /// <param name="index">The index of the object.</param>
+    /// <returns>A reference to the object itself.</returns>
     /// <exception cref="InvalidDataException">
     /// If the index was out-of-range.
     /// </exception>
     /// <exception cref="InvalidOperationException">
     /// If the object reference was not properly assigned.
     /// </exception>
-    public object GetExistingObject(uint index)
+    public object GetExistingReference(uint index)
     {
         CheckLastRefAssigned();
         if (index < _references.Count)
@@ -135,7 +135,10 @@ internal class DeserializationContext : IResettable
         /// <inheritdoc/>
         public int Count => _count;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Adds an element to the end of the list.
+        /// </summary>
+        /// <param name="item">The item to add.</param>
         public void Add(object? item)
         {
             EnsureCapacity(_count + 1);
@@ -143,7 +146,9 @@ internal class DeserializationContext : IResettable
             _count++;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Clears the list contents and discards all object references.
+        /// </summary>
         public void Clear()
         {
             var finalChunk = _count / ChunkLength;

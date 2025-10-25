@@ -3,7 +3,15 @@ using System.IO;
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
 
-internal class PolymorphicReferenceFormatter<T> : IFormatter<T?> where T : class
+/// <summary>
+/// Serializes objects of type <typeparamref name="T"/> with polymorphism.
+/// The type of the object is serialized along with its contents,
+/// meaning that the deserializer can determine its true type.
+/// </summary>
+/// <typeparam name="T">
+/// The concrete type to serialize.
+/// </typeparam>
+internal sealed class PolymorphicReferenceFormatter<T> : ReferenceFormatterBase<T> where T : class
 {
     /// <summary>
     /// The serializer from which to dynamically fetch formatters.
@@ -28,39 +36,21 @@ internal class PolymorphicReferenceFormatter<T> : IFormatter<T?> where T : class
     }
 
     /// <inheritdoc/>
-    public void Deserialize(BufferReader reader, out T? value)
+    protected override T RegisterObjectAndDeserialize(BufferReader reader)
     {
-        var reference = ReferenceId.Read(reader);
-        if (reference == ReferenceId.Null)
-        {
-            value = null;
-        }
-        else if (reference == ReferenceId.New)
-        {
-            _typeFormatter.Deserialize(reader, out var type);
+        _typeFormatter.Deserialize(reader, out var type);
 
-            if (type is null)
-            {
-                throw new InvalidDataException("Polymorphic type was not encoded properly: expected type, but got null");
-            }
-
-            value = (T)_serializer.GetPolymorphicDispatcher(type).RegisterObjectAndDeserialize(reader);
-        }
-        else
+        if (type is null)
         {
-            value = (T)reader.Context.GetExistingObject(reference.Index);
+            throw new InvalidDataException("Polymorphic type was not encoded properly: expected type, but got null");
         }
+
+        return (T)_serializer.GetPolymorphicDispatcher(type).RegisterObjectAndDeserialize(reader);
     }
 
     /// <inheritdoc/>
-    public void Serialize(BufferWriter writer, in T? value)
+    protected override void SerializeValue(BufferWriter writer, T value)
     {
-        var reference = writer.Context.AddOrGetReference(value);
-        if (reference == ReferenceId.New)
-        {
-            var type = value!.GetType();
-            _typeFormatter.Serialize(writer, type);
-            _serializer.GetPolymorphicDispatcher(type).SerializeValue(writer, value);
-        }
+        _serializer.GetPolymorphicDispatcher(value.GetType()).SerializeValue(writer, value);
     }
 }

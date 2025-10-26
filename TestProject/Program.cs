@@ -1,6 +1,4 @@
 ﻿using DouglasDwyer.PowerSerializer;
-using DouglasDwyer.PowerSerializer.Formatters;
-using System.Text;
 
 namespace TestProject
 {
@@ -29,8 +27,8 @@ namespace TestProject
             var ppp = new Cyclic { Foo = "ass1", Next = new[] { new Cyclic { Foo = "ass2" } } };
             ppp.Next[0]!.Next = new[] { null, ppp };
 
-            var ser = serializer.Serialize<object>(ppp);
-            var deser = serializer.Deserialize<object>(ser);
+            var ser = serializer.Serialize<Cyclic>(ppp);
+            var deser = serializer.Deserialize<Cyclic>(ser);
 
             Console.WriteLine("Hello, World!");
         }

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DouglasDwyer.PowerSerializer.Resolvers;
+using System;
 using System.Linq;
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
 
 /// <summary>
-/// Used in conjunction with <see cref="AttributeSpecifiedFormatter{T}"/>.
+/// Used in conjunction with <see cref="AttributeResolver"/>.
 /// This attribute (or derived variants thereof) can be added to types
 /// to specify how they are serialized.
 /// </summary>

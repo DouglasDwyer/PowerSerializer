@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using DouglasDwyer.PowerSerializer.Formatters;
+using DouglasDwyer.PowerSerializer.Resolvers;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -24,5 +26,14 @@ public class PowerSerializerOptions
         typeof(object).Assembly,
         typeof(IEnumerable).Assembly,
         typeof(IEnumerable<>).Assembly
+    ];
+
+    public IList<IFormatterResolver> Resolvers { get; } = [
+        new GenericResolver(typeof(AssemblyFormatter)),
+        new GenericResolver(typeof(TypeFormatter)),
+        new AttributeResolver(),
+        new ArrayResolver(),
+        new SingletonResolver(new PrimitiveFormatter()),
+        new GenericResolver(typeof(MemberFormatter<>)),
     ];
 }

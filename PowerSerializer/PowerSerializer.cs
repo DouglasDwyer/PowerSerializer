@@ -14,22 +14,21 @@ namespace DouglasDwyer.PowerSerializer;
 
 public sealed class PowerSerializer
 {
-    /// <summary>
-    /// A handle to the generic <see cref="CreateFormatter{T}"/> method.
-    /// </summary>
-    private static MethodInfo CreateFormatterMethod = typeof(PowerSerializer).GetMethod(nameof(CreateFormatter), BindingFlags.NonPublic | BindingFlags.Instance)!;
-
     // todo: prevent mutation :(
     /// <summary>
     /// The options that this serializer will use.
     /// </summary>
     public readonly PowerSerializerOptions Options;
 
-    private readonly FormatterList _formatterList;
-
+    /// <summary>
+    /// Formatters that are used to serialize the actual contents of objects.
+    /// </summary>
     private readonly ConditionalWeakTable<Type, ContentFormatters> _contentFormatters;
 
-    private readonly ConditionalWeakTable<Type, object> _referenceFormatters;
+    /// <summary>
+    /// Formatters that are used to serialize reference types and boxed value types.
+    /// </summary>
+    private readonly ConditionalWeakTable<Type, IFormatter> _referenceFormatters;
 
     public PowerSerializer() : this(new PowerSerializerOptions()) { }
 
@@ -40,9 +39,8 @@ public sealed class PowerSerializer
             throw new PlatformNotSupportedException("PowerSerializer requires runtime support for dynamic code generation");
         }
 
-        _formatterList = FormatterList.Default;  // todo
-        _referenceFormatters = new ConditionalWeakTable<Type, object>();
         _contentFormatters = new ConditionalWeakTable<Type, ContentFormatters>();
+        _referenceFormatters = new ConditionalWeakTable<Type, IFormatter>();
         Options = options;
     }
 
@@ -143,7 +141,7 @@ public sealed class PowerSerializer
     /// <returns>
     /// The formatter to use. This can be cast to <see cref="IFormatter{T}"/> where <c>T</c> equals <paramref name="type"/>.
     /// </returns>
-    public object GetFormatter(Type type)
+    public IFormatter GetFormatter(Type type)
     {
         if (type.IsValueType)
         {
@@ -185,63 +183,45 @@ public sealed class PowerSerializer
 
     private ContentFormatters CreateContentFormatters(Type type)
     {
-        var contentFormatter = CreateFormatterMethod.MakeGenericMethod(type).Invoke(this, null)!;
+        IFormatter? contentFormatter = null;
+        foreach (var resolver in Options.Resolvers)
+        {
+            if (resolver.GetFormatter(this, type) is IFormatter newFormatter)
+            {
+                contentFormatter = newFormatter;
+                break;
+            }
+        }
+
+        if (contentFormatter is null)
+        {
+            throw new MissingFormatterException(type);
+        }
+
         var polymorphicDispatcher = PolymorphicDispatcher.Create(type, contentFormatter);
         return new ContentFormatters { ContentFormatter = contentFormatter, PolymorphicDispatcher = polymorphicDispatcher };
     }
 
-    private object CreateReferenceFormatter(Type type)
+    private IFormatter CreateReferenceFormatter(Type type)
     {
-        return Activator.CreateInstance(typeof(ReferenceFormatter<>).MakeGenericType(type), [this])!;
+        return (IFormatter)Activator.CreateInstance(typeof(ReferenceFormatter<>).MakeGenericType(type), [this])!;
     }
 
-    private IFormatter<T?> CreateFormatter<T>()
-    {
-        // todo: i hate this code
-        foreach (var entry in _formatterList.Entries)
-        {
-            var equation = new GenericEquation(entry.FormatterType.GetGenericArguments());
-            foreach (var iface in entry.FormatterType.GetInterfaces())
-            {
-                if (equation.Solve(typeof(IFormatter<T?>), iface, out var substitutions))
-                {
-                    Type type;
-                    try
-                    {
-                        type = entry.FormatterType.IsGenericType ? entry.FormatterType.MakeGenericType(substitutions) : entry.FormatterType;
-                    }
-                    catch { continue; }
-
-                    foreach (var args in new[] { new[] { this }.Concat(entry.ConstructorArguments).ToArray(), entry.ConstructorArguments.ToArray() })
-                    {
-                        try
-                        {
-                            var args2 = args;
-                            var methodBase = Type.DefaultBinder.BindToMethod(
-                                BindingFlags.CreateInstance,
-                                type.GetConstructors(),
-                                ref args2!,
-                                null,
-                                null,
-                                null,
-                                out _
-                            );
-
-                            var result = ((ConstructorInfo)methodBase).Invoke(args);
-                            return (IFormatter<T?>)result;
-                        }
-                        catch { continue; }
-                    }
-                }
-            }
-        }
-
-        throw new MissingFormatterException(typeof(T));
-    }
-
+    /// <summary>
+    /// Holds formatters that are used to serialize the actual contents of an object.
+    /// </summary>
     private class ContentFormatters
     {
-        public required object ContentFormatter;
+        /// <summary>
+        /// The "value" formatter that defines how to serialize the actual contents of this type.
+        /// This formatter does not deal with references or polymorphism.
+        /// </summary>
+        public required IFormatter ContentFormatter;
+
+        /// <summary>
+        /// A shim for invoking the <see cref="ContentFormatter"/> in a weakly-typed context.
+        /// This is used when serializing polymorphic reference types and boxed value types.
+        /// </summary>
         public required IFormatter<object> PolymorphicDispatcher;
     }
 }

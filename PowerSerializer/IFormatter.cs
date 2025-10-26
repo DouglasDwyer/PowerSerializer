@@ -1,13 +1,19 @@
 ﻿namespace DouglasDwyer.PowerSerializer;
 
 /// <summary>
+/// Marker type that indicates a formatter. This must be cast
+/// to an <see cref="IFormatter{T}"/> before use.
+/// </summary>
+public interface IFormatter { }
+
+/// <summary>
 /// Defines how to serialize the contents of an object.
 /// This is the core interface that controls the serialization/deserialization process.
 /// </summary>
 /// <typeparam name="T">
 /// The concrete object type to be serialized.
 /// </typeparam>
-public interface IFormatter<T>
+public interface IFormatter<T> : IFormatter
 {
     /// <summary>
     /// Writes a binary representation of <paramref name="value"/> to a buffer.

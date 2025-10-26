@@ -198,7 +198,7 @@ public class MemberFormatter<T> : IFormatter<T>
         /// <summary>
         /// The formatter object to use.
         /// </summary>
-        public required object Formatter;
+        public required IFormatter Formatter;
 
         /// <summary>
         /// The field to serialize.

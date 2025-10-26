@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace DouglasDwyer.PowerSerializer;
+namespace DouglasDwyer.PowerSerializer.Formatters;
 
 /// <summary>
 /// A type-erased holder for an <see cref="IFormatter{T}"/>.
@@ -21,7 +21,7 @@ internal static class PolymorphicDispatcher
     /// <returns>
     /// A dispatcher that can be used to serialize <paramref name="type"/> in polymorphic scenarios.
     /// </returns>
-    public static IFormatter<object> Create(Type type, object contentFormatter)
+    public static IFormatter<object> Create(Type type, IFormatter contentFormatter)
     {
         return (IFormatter<object>)Activator.CreateInstance(HandlerTypeFor(type), contentFormatter)!;
     }

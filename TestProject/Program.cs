@@ -1,14 +1,24 @@
 ﻿using DouglasDwyer.PowerSerializer;
+using DouglasDwyer.PowerSerializer.Formatters;
 
 namespace TestProject
 {
-    public interface IAss<T> { }
-
-    public class Ass<T> : IAss<T>
+    public class Baz
     {
-        public Ass(string hurdur) { }
+        public bool Car;
+    }
 
-        //public Ass(List<int> foobar) { }
+    public sealed class Ass
+    {
+        public string Foo;
+        public int Bar = 4040;
+
+        public Ass() { }
+
+        public Ass(int bar)
+        {
+            Bar = bar;
+        }
     }
 
     internal class Program
@@ -20,10 +30,9 @@ namespace TestProject
 
             var serializer = new PowerSerializer(options);
 
-            var myObj = new object();
-            var ppp = new object[] { 1, "yourmom", myObj, false, new object(), myObj, 4, 5 };
-            var ser = serializer.Serialize<object[]>(ppp);
-            var deser = serializer.Deserialize<object[]>(ser);
+            var ppp = new Ass(58) { Foo = "foo" };
+            var ser = serializer.Serialize<Ass>(ppp);
+            var deser = serializer.Deserialize<Ass>(ser);
 
             Console.WriteLine("Hello, World!");
         }

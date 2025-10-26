@@ -130,6 +130,27 @@ public sealed class PowerSerializer
     }
 
     /// <summary>
+    /// Gets the formatter to use when serializing objects with base type <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">
+    /// The base class of all objects to be serialized.
+    /// </param>
+    /// <returns>
+    /// The formatter to use. This can be cast to <see cref="IFormatter{T}"/> where <c>T</c> equals <paramref name="type"/>.
+    /// </returns>
+    public object GetFormatter(Type type)
+    {
+        if (type.IsValueType)
+        {
+            return _contentFormatters.GetValue(type, CreateContentFormatters).ContentFormatter;
+        }
+        else
+        {
+            return _referenceFormatters.GetValue(type, CreateReferenceFormatter);
+        }
+    }
+
+    /// <summary>
     /// Gets the formatter to use when serializing objects with base type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">
@@ -140,14 +161,7 @@ public sealed class PowerSerializer
     /// </returns>
     public IFormatter<T?> GetFormatter<T>()
     {
-        if (typeof(T).IsValueType)
-        {
-            return (IFormatter<T?>)_contentFormatters.GetValue(typeof(T), CreateContentFormatters).ContentFormatter;
-        }
-        else
-        {
-            return (IFormatter<T?>)_referenceFormatters.GetValue(typeof(T), CreateReferenceFormatter);
-        }
+        return (IFormatter<T?>)GetFormatter(typeof(T));
     }
 
     /// <summary>

@@ -14,12 +14,13 @@ public sealed class FormatterList
     /// </summary>
     public static readonly FormatterList Default = new FormatterList()
         .With(typeof(AttributeSpecifiedFormatter<>), typeof(DefaultFormatterAttribute))
-        .With(typeof(ArrayFormatter<>))
         .With(typeof(AssemblyFormatter))
+        .With(typeof(PrimitiveFormatter))
+        .With(typeof(TypeFormatter))
+        .With(typeof(ArrayFormatter<>))
         //.With(typeof(BlitArrayFormatter<>))
         //.With(typeof(BlitFormatter<>))
-        .With(typeof(PrimitiveFormatter))
-        .With(typeof(TypeFormatter));
+        .With(typeof(MemberFormatter<>));
 
     /// <summary>
     /// Gets an iterator over all entries in this list.

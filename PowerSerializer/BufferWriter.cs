@@ -202,6 +202,19 @@ public ref struct BufferWriter
         Advance(sizeof(double));
     }
 
+    /// <inheritdoc cref="WriteUInt8(byte)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteDecimal(decimal value)
+    {
+        Span<int> output = stackalloc int[sizeof(decimal) / sizeof(int)];
+        decimal.GetBits(value, output);
+        
+        foreach (var section in output)
+        {
+            WriteInt32(section);
+        }
+    }
+
     /// <inheritdoc cref="WriteUInt8"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteBool(bool value)

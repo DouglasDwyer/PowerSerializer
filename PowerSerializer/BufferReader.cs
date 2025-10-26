@@ -196,6 +196,13 @@ public ref struct BufferReader
 
     /// <inheritdoc cref="ReadUInt8"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public decimal ReadDecimal()
+    {
+        return new decimal([ReadInt32(), ReadInt32(), ReadInt32(), ReadInt32()]);
+    }
+
+    /// <inheritdoc cref="ReadUInt8"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool ReadBool()
     {
         switch (ReadUInt8())

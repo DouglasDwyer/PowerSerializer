@@ -12,6 +12,9 @@ public sealed class PrimitiveFormatter :
     IFormatter<short>,
     IFormatter<int>,
     IFormatter<long>,
+    IFormatter<float>,
+    IFormatter<double>,
+    IFormatter<decimal>,
     IFormatter<bool>,
     IFormatter<char>,
     IFormatter<string>,
@@ -77,6 +80,12 @@ public sealed class PrimitiveFormatter :
 
     /// <inheritdoc/>
     public void Serialize(BufferWriter writer, in double value) => writer.WriteDouble(value);
+
+    /// <inheritdoc/>
+    public void Deserialize(BufferReader reader, out decimal value) => value = reader.ReadDecimal();
+
+    /// <inheritdoc/>
+    public void Serialize(BufferWriter writer, in decimal value) => writer.WriteDecimal(value);
 
     /// <inheritdoc/>
     public void Deserialize(BufferReader reader, out bool value) => value = reader.ReadBool();

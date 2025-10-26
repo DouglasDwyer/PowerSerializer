@@ -26,7 +26,7 @@ namespace TestProject
 
             var ppp = new Type[] { typeof(int).GetType(), typeof(List<string>) };
 
-            var ser = serializer.Serialize<object>(typeof(List<>));
+            var ser = serializer.Serialize<object>(ppp);
             var deser = serializer.Deserialize<object>(ser);
 
             Console.WriteLine("Hello, World!");

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Buffers;
 using System.Buffers.Binary;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -13,16 +12,27 @@ namespace DouglasDwyer.PowerSerializer;
 public ref struct BufferWriter
 {
     /// <summary>
+    /// The minimum number of bytes that will be requested from the writer at a time.
+    /// </summary>
+    private const int MinBlockSize = 256;
+
+    /// <summary>
     /// Shared serializer state.
     /// </summary>
-    internal readonly SerializationContext Context;
+    internal readonly SerializationContext Context => _state.Context;
 
-    private readonly IBufferWriter<byte> _writer;
+    /// <summary>
+    /// The inner writer state.
+    /// </summary>
+    private ref State _state;
 
-    internal BufferWriter(SerializationContext context, IBufferWriter<byte> writer)
+    /// <summary>
+    /// Creates a new buffer writer.
+    /// </summary>
+    /// <param name="state">The state to use.</param>
+    internal BufferWriter(ref State state)
     {
-        Context = context;
-        _writer = writer;
+        _state = ref state;
     }
 
     /// <summary>
@@ -34,7 +44,17 @@ public ref struct BufferWriter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Advance(int count)
     {
-        _writer.Advance(count);
+        var blockEnd = _state.CurrentBlockWritten + count;
+        if (blockEnd <= _state.CurrentBlock.Length)
+        {
+            _state.CurrentBlockWritten = blockEnd;
+        }
+        else
+        {
+            _state.Writer.Advance(blockEnd);
+            _state.CurrentBlock = Memory<byte>.Empty;
+            _state.CurrentBlockWritten = 0;
+        }
     }
 
     /// <summary>
@@ -51,7 +71,18 @@ public ref struct BufferWriter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Span<byte> GetSpan(int count)
     {
-        return _writer.GetSpan(count)[..count];
+        var blockEnd = _state.CurrentBlockWritten + count;
+        if (blockEnd <= _state.CurrentBlock.Length)
+        {
+            return _state.CurrentBlock.Span[_state.CurrentBlockWritten..blockEnd];
+        }
+        else
+        {
+            _state.Writer.Advance(_state.CurrentBlockWritten);
+            _state.CurrentBlock = _state.Writer.GetMemory(Math.Max(count, MinBlockSize));
+            _state.CurrentBlockWritten = 0;
+            return _state.CurrentBlock.Span[..count];
+        }
     }
 
     /// <summary>
@@ -293,6 +324,46 @@ public ref struct BufferWriter
                 WriteUInt8(toWrite);
                 break;
             }
+        }
+    }
+
+    /// <summary>
+    /// Holds shared state for the buffer writer.
+    /// </summary>
+    internal struct State
+    {
+        /// <summary>
+        /// The current block of memory to which data is being written.
+        /// </summary>
+        public Memory<byte> CurrentBlock;
+
+        /// <summary>
+        /// The number of bytes in <see cref="CurrentBlock"/> that have been written
+        /// (starting from the beginning).
+        /// </summary>
+        public int CurrentBlockWritten;
+
+        /// <summary>
+        /// Shared serialization context.
+        /// </summary>
+        public readonly SerializationContext Context;
+
+        /// <summary>
+        /// The buffer implementation.
+        /// </summary>
+        public readonly IBufferWriter<byte> Writer;
+
+        /// <summary>
+        /// Creates a new buffer reader state.
+        /// </summary>
+        /// <param name="context">The serialization context.</param>
+        /// <param name="writer">The target buffer.</param>
+        public State(SerializationContext context, IBufferWriter<byte> writer)
+        {
+            CurrentBlock = Memory<byte>.Empty;
+            CurrentBlockWritten = 0;
+            Context = context;
+            Writer = writer;
         }
     }
 }

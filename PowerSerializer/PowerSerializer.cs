@@ -78,7 +78,9 @@ public sealed class PowerSerializer
         var context = SerializationContext.Pool.Get();
         try
         {
-            GetFormatter<T>().Serialize(new BufferWriter(context, writer), value);
+            var state = new BufferWriter.State(context, writer);
+            GetFormatter<T>().Serialize(new BufferWriter(ref state), value);
+            state.Writer.Advance(state.CurrentBlockWritten);
         }
         finally
         {

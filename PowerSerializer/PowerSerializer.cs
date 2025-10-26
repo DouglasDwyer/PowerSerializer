@@ -1,7 +1,9 @@
 ﻿using DouglasDwyer.PowerSerializer.Formatters;
 using System;
 using System.Buffers;
+using System.Collections.Immutable;
 using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -11,6 +13,18 @@ namespace DouglasDwyer.PowerSerializer;
 
 public sealed class PowerSerializer
 {
+    /// <summary>
+    /// Although these types are not sealed, their derived variants (like <c>RuntimeType</c>)
+    /// are almost always internal to C#. As such, they are treated as sealed.
+    /// </summary>
+    internal static readonly ImmutableHashSet<Type> ArtificallySealedTypes = [
+        typeof(Assembly),
+        typeof(ConstructorInfo),
+        typeof(FieldInfo),
+        typeof(MethodInfo),
+        typeof(Type),
+    ];
+
     // todo: prevent mutation :(
     /// <summary>
     /// The options that this serializer will use.
@@ -210,6 +224,14 @@ public sealed class PowerSerializer
     /// </exception>
     private ContentFormatters CreateContentFormatters(Type type)
     {
+        foreach (var sealedType in ArtificallySealedTypes)
+        {
+            if (type.IsAssignableTo(sealedType) && type != sealedType)
+            {
+                return CreateContentFormatters(sealedType);
+            }
+        }
+
         IFormatter? contentFormatter = null;
         foreach (var resolver in Options.Resolvers)
         {

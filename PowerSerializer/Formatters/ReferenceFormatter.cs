@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
@@ -153,8 +154,7 @@ internal sealed class ReferenceFormatter<T> : IFormatter<T?> where T : class
         else
         {
             return type.IsSealed
-                || type.IsAssignableTo(typeof(Assembly))
-                || (type != typeof(MemberInfo) && type.IsAssignableTo(typeof(MemberInfo)));
+                || PowerSerializer.ArtificallySealedTypes.Any(type.IsAssignableTo);
         }
     }
 

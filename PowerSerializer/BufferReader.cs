@@ -227,7 +227,7 @@ public ref struct BufferReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string ReadString()
     {
-        return ReadString(Encoding.Unicode);
+        return ReadString(Encoding.UTF8);
     }
 
     /// <summary>

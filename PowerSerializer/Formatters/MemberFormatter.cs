@@ -1,21 +1,11 @@
-﻿using System;
+﻿using FastExpressionCompiler;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
-
-public static class Tester
-{
-    public static void AfterDeser(BufferReader reader, in int value)
-    {
-        reader.ReadInt32();
-        Unsafe.AsRef(in value) = 22;
-        Console.WriteLine("rage of stinky " + value);
-    }
-}
 
 /// <summary>
 /// Serializes a type by iterating over its individual members and serializing them.
@@ -73,27 +63,17 @@ public class MemberFormatter<T> : IFormatter<T>
         for (var i = 0; i < entries.Length; i++)
         {
             var entry = entries[i];
-            if (entry.Member.FieldType == typeof(int))
-            {
-                bodyStatements[i + 1] = Expression.Call(
-                    null,
-                    typeof(Tester).GetMethod("AfterDeser")!,
-                    readerParam,
-                    Expression.Field(valueParam, entry.Member));
-            }
-            else
-            {
-                bodyStatements[i + 1] = Expression.Call(
-                    Expression.Constant(entry.Formatter),
-                    GetDeserializeImplementation(entry.Formatter.GetType(), entry.Member.FieldType),
-                    readerParam,
-                    Expression.Field(valueParam, entry.Member));
-            }
+            bodyStatements[i + 1] = Expression.Call(
+                Expression.Constant(entry.Formatter),
+                GetDeserializeImplementation(entry.Formatter, entry.Member.FieldType),
+                readerParam,
+                Expression.Field(valueParam, entry.Member));
         }
 
         var body = Expression.Block(bodyStatements);
         var lambda = Expression.Lambda<DeserializeDelegate>(body, readerParam, valueParam);
-        return lambda.Compile(true);
+
+        return lambda.CompileFast(false, CompilerFlags.DisableInterpreter | CompilerFlags.ThrowOnNotSupportedExpression);
     }
 
     private static SerializeDelegate CompileSerializer(Type type, ReadOnlySpan<FieldEntry> entries)
@@ -108,14 +88,15 @@ public class MemberFormatter<T> : IFormatter<T>
             var entry = entries[i];
             bodyStatements[i] = Expression.Call(
                 Expression.Constant(entry.Formatter),
-                GetSerializeImplementation(entry.Formatter.GetType(), entry.Member.FieldType),
+                GetSerializeImplementation(entry.Formatter, entry.Member.FieldType),
                 writerParam,
                 Expression.Field(valueParam, entry.Member));
         }
 
         var body = Expression.Block(bodyStatements);
         var lambda = Expression.Lambda<SerializeDelegate>(body, writerParam, valueParam);
-        return lambda.Compile(true);
+
+        return lambda.CompileFast(false, CompilerFlags.DisableInterpreter | CompilerFlags.ThrowOnNotSupportedExpression);
     }
 
     private static FieldEntry[] GetEntries(PowerSerializer serializer, Type type, IEnumerable<FieldInfo> fields)
@@ -150,23 +131,61 @@ public class MemberFormatter<T> : IFormatter<T>
         return result;
     }
 
-    private static MethodInfo GetSerializeImplementation(Type formatterType, Type targetType)
+    /// <summary>
+    /// Gets the concrete deserialize method for a formatter.
+    /// </summary>
+    /// <param name="formatter">The formatter object.</param>
+    /// <param name="targetType">The type to be deserialized.</param>
+    /// <returns>
+    /// The implementation of <see cref="IFormatter{T}.Deserialize(BufferReader, out T)"/> that will be invoked.
+    /// </returns>
+    private static MethodInfo GetDeserializeImplementation(object formatter, Type targetType)
     {
-        // todo: cache some of this
-        var formatterInterface = typeof(IFormatter<>).MakeGenericType(targetType);
-        return GetImplementationMethod(formatterType, formatterInterface, formatterInterface.GetMethod("Serialize")!);
+        return GetImplementationMethod(
+            formatter.GetType(),
+            typeof(IFormatter<>).MakeGenericType(targetType).GetMethod(nameof(IFormatter<bool>.Deserialize))!);
     }
 
-    private static MethodInfo GetDeserializeImplementation(Type formatterType, Type targetType)
+    /// <summary>
+    /// Gets the concrete serialize method for a formatter.
+    /// </summary>
+    /// <param name="formatter">The formatter object.</param>
+    /// <param name="targetType">The type to be serialized.</param>
+    /// <returns>
+    /// The implementation of <see cref="IFormatter{T}.Serialize(BufferWriter, in T)"/> that will be invoked.
+    /// </returns>
+    private static MethodInfo GetSerializeImplementation(object formatter, Type targetType)
     {
-        // todo: cache some of this
-        var formatterInterface = typeof(IFormatter<>).MakeGenericType(targetType);
-        return GetImplementationMethod(formatterType, formatterInterface, formatterInterface.GetMethod("Deserialize")!);
+        return GetImplementationMethod(
+            formatter.GetType(),
+            typeof(IFormatter<>).MakeGenericType(targetType).GetMethod(nameof(IFormatter<bool>.Serialize))!);
     }
 
-    private static MethodInfo GetImplementationMethod(Type implementingClass, Type implementedInterface, MethodInfo interfaceMethod)
+    /// <summary>
+    /// Gets the concrete implementation of an interface method.
+    /// </summary>
+    /// <param name="implementingClass">The class implementing the interface.</param>
+    /// <param name="interfaceMethod">The interface method definition.</param>
+    /// <returns>The corresponding implementation method.</returns>
+    /// <exception cref="ArgumentException">
+    /// If <paramref name="interfaceMethod"/> was not an interface method.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// If <paramref name="implementingClass"/> did not implement the interface to which <paramref name="interfaceMethod"/> belongs.
+    /// </exception>
+    private static MethodInfo GetImplementationMethod(Type implementingClass, MethodInfo interfaceMethod)
     {
-        var map = implementingClass.GetInterfaceMap(implementedInterface);
+        if (interfaceMethod.DeclaringType is null || !interfaceMethod.DeclaringType.IsInterface)
+        {
+            throw new ArgumentException($"Expected method {interfaceMethod} to belong to interface");
+        }
+
+        if (!implementingClass.IsAssignableTo(interfaceMethod.DeclaringType))
+        {
+            throw new ArgumentException($"Expected implementing class {implementingClass} to be assignable to interface {interfaceMethod.DeclaringType}", nameof(implementingClass));
+        }
+
+        var map = implementingClass.GetInterfaceMap(interfaceMethod.DeclaringType);
         var index = Array.IndexOf(map.InterfaceMethods, interfaceMethod);
         return map.TargetMethods[index];
     }

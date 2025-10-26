@@ -1,5 +1,6 @@
 ﻿using DouglasDwyer.PowerSerializer;
 using DouglasDwyer.PowerSerializer.Formatters;
+using System.Text;
 
 namespace TestProject
 {
@@ -8,17 +9,10 @@ namespace TestProject
         public bool Car;
     }
 
-    public sealed class Ass
+    public sealed class Cyclic
     {
         public string Foo;
-        public int Bar = 4040;
-
-        public Ass() { }
-
-        public Ass(int bar)
-        {
-            Bar = bar;
-        }
+        public Cyclic Next;
     }
 
     internal class Program
@@ -30,9 +24,11 @@ namespace TestProject
 
             var serializer = new PowerSerializer(options);
 
-            var ppp = new Ass(58) { Foo = "foo" };
-            var ser = serializer.Serialize<Ass>(ppp);
-            var deser = serializer.Deserialize<Ass>(ser);
+            var ppp = new Cyclic { Foo = "ass1", Next = new Cyclic { Foo = "ass2" } };
+            ppp.Next.Next = ppp;
+
+            var ser = serializer.Serialize<Cyclic>(ppp);
+            var deser = serializer.Deserialize<Cyclic>(ser);
 
             Console.WriteLine("Hello, World!");
         }

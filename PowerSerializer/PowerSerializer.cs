@@ -17,7 +17,7 @@ public sealed class PowerSerializer
     /// <summary>
     /// A handle to the generic <see cref="CreateFormatter{T}"/> method.
     /// </summary>
-    private static MethodInfo CreateFormatterMethod = typeof(PowerSerializer).GetMethod("CreateFormatter", BindingFlags.NonPublic | BindingFlags.Instance)!;
+    private static MethodInfo CreateFormatterMethod = typeof(PowerSerializer).GetMethod(nameof(CreateFormatter), BindingFlags.NonPublic | BindingFlags.Instance)!;
 
     // todo: prevent mutation :(
     /// <summary>
@@ -35,6 +35,11 @@ public sealed class PowerSerializer
 
     public PowerSerializer(PowerSerializerOptions options)
     {
+        if (!RuntimeFeature.IsDynamicCodeSupported)
+        {
+            throw new PlatformNotSupportedException("PowerSerializer requires runtime support for dynamic code generation");
+        }
+
         _formatterList = FormatterList.Default;  // todo
         _referenceFormatters = new ConditionalWeakTable<Type, object>();
         _contentFormatters = new ConditionalWeakTable<Type, ContentFormatters>();

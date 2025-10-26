@@ -233,7 +233,7 @@ public ref struct BufferWriter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteString(string value)
     {
-        WriteString(value, Encoding.Unicode);
+        WriteString(value, Encoding.UTF8);
     }
 
     /// <summary>

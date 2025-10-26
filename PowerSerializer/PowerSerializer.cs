@@ -1,10 +1,7 @@
 ﻿using DouglasDwyer.PowerSerializer.Formatters;
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -89,7 +86,13 @@ public sealed class PowerSerializer
     /// </param>
     /// <returns>The generated object.</returns>
     /// <exception cref="InvalidDataException">
+    /// If the input did not describe a valid object.
+    /// </exception>
+    /// <exception cref="InvalidDataException">
     /// If there was leftover data in the buffer after serialization.
+    /// </exception>
+    /// <exception cref="MissingFormatterException">
+    /// If no formatter could be found to deserialize the type.
     /// </exception>
     public T? Deserialize<T>(ReadOnlySpan<byte> data)
     {
@@ -116,6 +119,12 @@ public sealed class PowerSerializer
     /// containing whatever data remained after deserialization.
     /// </param>
     /// <returns>The generated object.</returns>
+    /// <exception cref="InvalidDataException">
+    /// If the input did not describe a valid object.
+    /// </exception>
+    /// <exception cref="MissingFormatterException">
+    /// If no formatter could be found to serialize the type.
+    /// </exception>
     public T? Deserialize<T>(ref ReadOnlySpan<byte> data)
     {
         var context = DeserializationContext.Pool.Get();
@@ -141,6 +150,9 @@ public sealed class PowerSerializer
     /// <returns>
     /// The formatter to use. This can be cast to <see cref="IFormatter{T}"/> where <c>T</c> equals <paramref name="type"/>.
     /// </returns>
+    /// <exception cref="MissingFormatterException">
+    /// If no formatter could be found to serialize/deserialize the type.
+    /// </exception>
     public IFormatter GetFormatter(Type type)
     {
         if (type.IsValueType)
@@ -162,6 +174,9 @@ public sealed class PowerSerializer
     /// <returns>
     /// The formatter to use.
     /// </returns>
+    /// <exception cref="MissingFormatterException">
+    /// If no formatter could be found to serialize/deserialize the type.
+    /// </exception>
     public IFormatter<T?> GetFormatter<T>()
     {
         return (IFormatter<T?>)GetFormatter(typeof(T));
@@ -175,12 +190,24 @@ public sealed class PowerSerializer
     /// <returns>
     /// A dispatcher that can be used to serialize and deserialize it.
     /// </returns>
+    /// <exception cref="MissingFormatterException">
+    /// If no formatter could be found to serialize/deserialize the type.
+    /// </exception>
     internal IFormatter<object> GetPolymorphicDispatcher(Type type)
     {
         return _contentFormatters.GetValue(type, CreateContentFormatters).PolymorphicDispatcher;
     }
 
-
+    /// <summary>
+    /// Generates new content formatters for the given type.
+    /// </summary>
+    /// <param name="type">
+    /// The concrete type being serialized.
+    /// </param>
+    /// <returns></returns>
+    /// <exception cref="MissingFormatterException">
+    /// If no formatter could be found to serialize/deserialize the type.
+    /// </exception>
     private ContentFormatters CreateContentFormatters(Type type)
     {
         IFormatter? contentFormatter = null;
@@ -202,6 +229,13 @@ public sealed class PowerSerializer
         return new ContentFormatters { ContentFormatter = contentFormatter, PolymorphicDispatcher = polymorphicDispatcher };
     }
 
+    /// <summary>
+    /// Creates the reference formatter for the provided type.
+    /// </summary>
+    /// <param name="type">The type in question.</param>
+    /// <returns>
+    /// A formatter for serializing <paramref name="type"/> that respects object references.
+    /// </returns>
     private IFormatter CreateReferenceFormatter(Type type)
     {
         return (IFormatter)Activator.CreateInstance(typeof(ReferenceFormatter<>).MakeGenericType(type), [this])!;

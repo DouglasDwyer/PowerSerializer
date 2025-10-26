@@ -166,7 +166,7 @@ internal static class PolymorphicDispatcher
         /// <inheritdoc/>
         public void Deserialize(BufferReader reader, out object value)
         {
-            // Note: it is impossible for readonly structs to contain a cyclic reference.
+            // Note: it should be impossible for readonly structs to contain a cyclic reference.
             // Therefore, it is safe to call deserialize before allocating the boxed object.
             _contentFormatter.Deserialize(reader, out var result);
             value = result;

@@ -12,7 +12,9 @@ namespace TestProject
     public sealed class Cyclic
     {
         public string Foo;
-        public Cyclic Next;
+        public Cyclic?[] Next;
+
+        public Cyclic() { }
     }
 
     internal class Program
@@ -24,11 +26,11 @@ namespace TestProject
 
             var serializer = new PowerSerializer(options);
 
-            var ppp = new Cyclic { Foo = "ass1", Next = new Cyclic { Foo = "ass2" } };
-            ppp.Next.Next = ppp;
+            var ppp = new Cyclic { Foo = "ass1", Next = new[] { new Cyclic { Foo = "ass2" } } };
+            ppp.Next[0]!.Next = new[] { null, ppp };
 
-            var ser = serializer.Serialize<Cyclic>(ppp);
-            var deser = serializer.Deserialize<Cyclic>(ser);
+            var ser = serializer.Serialize<object>(ppp);
+            var deser = serializer.Deserialize<object>(ser);
 
             Console.WriteLine("Hello, World!");
         }

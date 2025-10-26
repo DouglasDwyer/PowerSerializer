@@ -146,9 +146,16 @@ internal sealed class ReferenceFormatter<T> : IFormatter<T?> where T : class
     /// </returns>
     private static bool IsTypeSealed(Type type)
     {
-        return (type.IsSealed && !type.IsArray)
-            || type.IsAssignableTo(typeof(Assembly))
-            || (type != typeof(MemberInfo) && type.IsAssignableTo(typeof(MemberInfo)));
+        if (type.IsArray)
+        {
+            return IsTypeSealed(type.GetElementType()!);
+        }
+        else
+        {
+            return type.IsSealed
+                || type.IsAssignableTo(typeof(Assembly))
+                || (type != typeof(MemberInfo) && type.IsAssignableTo(typeof(MemberInfo)));
+        }
     }
 
     /// <summary>

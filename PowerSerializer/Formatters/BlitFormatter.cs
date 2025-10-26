@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
 
-internal class BlitFormatter<T> : IFormatter<T> where T : unmanaged
+internal class BlitFormatter<T> : IFormatter<T>, ISpanFormatter<T> where T : unmanaged
 {
     public BlitFormatter()
     {
@@ -27,6 +27,19 @@ internal class BlitFormatter<T> : IFormatter<T> where T : unmanaged
     public void Serialize(BufferWriter writer, in T value)
     {
         writer.Write(MemoryMarshal.AsBytes(new ReadOnlySpan<T>(in value)));
+    }
+
+    /// <inheritdoc/>
+    public void Deserialize(BufferReader reader, Span<T> elements)
+    {
+        var resultBytes = MemoryMarshal.AsBytes(elements);
+        reader.Read(resultBytes.Length).CopyTo(resultBytes);
+    }
+
+    /// <inheritdoc/>
+    public void Serialize(BufferWriter writer, ReadOnlySpan<T> elements)
+    {
+        writer.Write(MemoryMarshal.AsBytes(elements));
     }
 
     /*

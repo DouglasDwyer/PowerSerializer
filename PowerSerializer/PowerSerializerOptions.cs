@@ -33,7 +33,14 @@ public class PowerSerializerOptions
         new GenericResolver(typeof(TypeFormatter)),
         new AttributeResolver(),
         new ArrayResolver(),
+        new ComparerCollectionResolver(),
+        new SingletonResolver(new CultureInfoFormatter()),
         new SingletonResolver(new PrimitiveFormatter()),
+        new SingletonResolver(new ReferenceEqualityComparerFormatter()),
+        new GenericResolver(typeof(KeyValuePairFormatter<,>)),
+        new GenericResolver(typeof(ListFormatter<>)),
+        new GenericResolver(typeof(QueueFormatter<>)),
+        new GenericResolver(typeof(StackFormatter<>)),
         new GenericResolver(typeof(MemberFormatter<>)),
     ];
 }

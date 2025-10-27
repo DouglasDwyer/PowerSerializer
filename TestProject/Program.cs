@@ -24,7 +24,11 @@ namespace TestProject
 
             var serializer = new PowerSerializer(options);
 
-            var ppp = new Type[] { typeof(int).GetType(), typeof(List<string>) };
+            var ppp = new Dictionary<string, string>() { { "mykey", "hi" }, { "stinker list", "bye" } };
+            /*var ppp = new HashSet<object>();
+            ppp.Add(1);
+            ppp.Add(-2);
+            ppp.Add(64);*/
 
             var ser = serializer.Serialize<object>(ppp);
             var deser = serializer.Deserialize<object>(ser);

@@ -22,12 +22,12 @@ public class MemberFormatter<T> : IFormatter<T>
     {
         try
         {
-            if (typeof(T).GetConstructor(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static, []) is null)
+            if (typeof(T).IsClass && typeof(T).GetConstructor(BindingFlags.Public | BindingFlags.Instance, []) is null)
             {
                 throw new ArgumentException("Member-formatted types must have public parameterless constructor", nameof(T));
             }
 
-            var fields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            var fields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.NonPublic);
             var entries = GetEntries(serializer, typeof(T), fields);
 
             _deserialize = CompileDeserializer(typeof(T), entries);

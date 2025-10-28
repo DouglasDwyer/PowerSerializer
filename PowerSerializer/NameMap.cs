@@ -4,12 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Hashing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DouglasDwyer.PowerSerializer;
 
 /// <summary>
-/// Assigns persistent integer IDs to objects based upon their name.
+/// Assigns persistent integer IDs to objects based upon their names.
 /// </summary>
 /// <typeparam name="T">
 /// The type of object that this map will hold.
@@ -26,6 +25,14 @@ internal sealed class NameMap<T> where T : class
     /// </summary>
     private readonly Dictionary<T, ulong> _objectToId;
 
+    /// <summary>
+    /// Constructs a new map for the given collection.
+    /// </summary>
+    /// <param name="elements">The elements to include in the map.</param>
+    /// <param name="nameGetter">
+    /// A function that gets a unique name for every element in the iterator.
+    /// The name will be hashed using a stable algorithm to produce a persistent ID.
+    /// </param>
     public NameMap(IEnumerable<T> elements, Func<T, string> nameGetter)
     {
         var count = elements.Count();
@@ -43,11 +50,23 @@ internal sealed class NameMap<T> where T : class
         }
     }
 
+    /// <summary>
+    /// Gets the object associated with the given ID, if any.
+    /// </summary>
+    /// <param name="id">The name hash of the object.</param>
+    /// <param name="obj">The object, if found, is written to this variable.</param>
+    /// <returns><c>true</c> if an object was found for the ID.</returns>
     public bool TryGetObject(ulong id, [NotNullWhen(true)] out T? obj)
     {
         return _idToObject.TryGetValue(id, out obj);
     }
 
+    /// <summary>
+    /// Gets the ID associated with the given object, if any.
+    /// </summary>
+    /// <param name="obj">The object in question.</param>
+    /// <param name="id">The name hash, if found, is written to this variable.</param>
+    /// <returns><c>true</c> if the object had an ID.</returns>
     public bool TryGetId(T obj, out ulong id)
     {
         return _objectToId.TryGetValue(obj, out id);

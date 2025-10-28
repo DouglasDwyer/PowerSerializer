@@ -103,6 +103,15 @@ public sealed class TypeFormatter : IFormatter<Type>
                 value = definition.MakeGenericType(types);
                 break;
                 }
+            case TypeKind.BuiltinDefinition:
+            {
+                var id = reader.ReadUInt16();
+                if (!BuiltinTypes.TryGetType(id, out value!))
+                {
+                    throw new TypeLoadException("Could not find builtin type by ID");
+                }
+                break;
+            }
             case TypeKind.KnownDefinition:
             {
                 var id = reader.ReadUInt64();
@@ -170,10 +179,15 @@ public sealed class TypeFormatter : IFormatter<Type>
         }
         else if (!value.ContainsGenericParameters || value.IsGenericTypeDefinition)
         {
-            if (_knownTypes.TryGetId(value, out var id))
+            if (BuiltinTypes.TryGetId(value, out var builtinId))
+            {
+                writer.WriteUInt8((byte)TypeMetadata.BuiltinDefinition());
+                writer.WriteUInt16(builtinId);
+            }
+            else if (_knownTypes.TryGetId(value, out var knownId))
             {
                 writer.WriteUInt8((byte)TypeMetadata.KnownDefinition());
-                writer.WriteUInt64(id);
+                writer.WriteUInt64(knownId);
             }
             else
             {
@@ -257,6 +271,11 @@ public sealed class TypeFormatter : IFormatter<Type>
         /// A non-generic type or an open generic type.
         /// </summary>
         Definition,
+
+        /// <summary>
+        /// A non-generic or open generic type from the <see cref="BuiltinTypes"/>.
+        /// </summary>
+        BuiltinDefinition,
 
         /// <summary>
         /// A non-generic or open generic type from one of the <see cref="PowerSerializerOptions.KnownAssemblies"/>.
@@ -363,6 +382,15 @@ public sealed class TypeFormatter : IFormatter<Type>
         public static TypeMetadata Definition(int genericArity)
         {
             return new TypeMetadata(TypeKind.Definition, genericArity);
+        }
+
+        /// <summary>
+        /// A non-generic or open generic type from the <see cref="BuiltinTypes"/>.
+        /// </summary>
+        /// <returns>The associated metadata.</returns>
+        public static TypeMetadata BuiltinDefinition()
+        {
+            return new TypeMetadata(TypeKind.BuiltinDefinition, 0);
         }
 
         /// <summary>

@@ -79,8 +79,8 @@ internal sealed class NameMap<T> where T : class
     /// <returns>A unique ID.</returns>
     private static ulong HashName(string name)
     {
-        Span<byte> nameBytes = stackalloc byte[Encoding.ASCII.GetByteCount(name)];
-        Encoding.ASCII.GetBytes(name, nameBytes);
+        Span<byte> nameBytes = stackalloc byte[Encoding.UTF8.GetByteCount(name)];
+        Encoding.UTF8.GetBytes(name, nameBytes);
         return XxHash64.HashToUInt64(nameBytes);
     }
 }

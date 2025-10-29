@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace DouglasDwyer.PowerSerializer.Formatters;
@@ -16,6 +17,11 @@ public sealed class TypeFormatter : IFormatter<Type>
     /// Formats assembly references.
     /// </summary>
     private readonly IFormatter<Assembly?> _assemblyFormatter;
+
+    /// <summary>
+    /// Caches the arrays of generic type arguments returned by <see cref="Type.GetGenericArguments"/>.
+    /// </summary>
+    private readonly ConditionalWeakTable<Type, Type[]> _genericArgumentsCache;
 
     /// <summary>
     /// A lookup table between types and persistent hashes.
@@ -44,6 +50,7 @@ public sealed class TypeFormatter : IFormatter<Type>
     public TypeFormatter(PowerSerializer serializer)
     {
         _assemblyFormatter = serializer.GetFormatter<Assembly>();
+        _genericArgumentsCache = new ConditionalWeakTable<Type, Type[]>();
         _knownTypes = new NameMap<Type>(
             serializer.Options.KnownAssemblies.Where(x => !x.IsDynamic).SelectMany(x => x.GetTypes()),
             PersistentTypeName);
@@ -90,7 +97,7 @@ public sealed class TypeFormatter : IFormatter<Type>
                 _typeReferenceFormatter.Deserialize(reader, out var definition);
                 ThrowInvalidDataExceptionIfNull(definition, "Generic type was not encoded properly: expected type definition, but got null");
 
-                var typeCount = definition!.GetGenericArguments().Length;  // todo: cache
+                var typeCount = _genericArgumentsCache.GetValue(definition!, x => x.GetGenericArguments()).Length;
                 var types = new Type[typeCount];
 
                 for (var i = 0; i < typeCount; i++)
@@ -124,9 +131,7 @@ public sealed class TypeFormatter : IFormatter<Type>
             case TypeKind.Definition:
             default:
             {
-                var rawName = reader.ReadString(Encoding.ASCII);
-                var fullName = 0 < metadata.Arity ? $"{rawName}`{metadata.Arity}" : rawName;
-
+                var fullName = reader.ReadString();
                 _assemblyFormatter.Deserialize(reader, out var assembly);
                 ThrowInvalidDataExceptionIfNull(assembly, "Type was not encoded properly: expected assembly, but got null");
                 var result = assembly.GetType(fullName);
@@ -171,8 +176,8 @@ public sealed class TypeFormatter : IFormatter<Type>
         {
             writer.WriteUInt8((byte)TypeMetadata.ConstructedGeneric());
             _typeReferenceFormatter.Serialize(writer, value.GetGenericTypeDefinition());
-
-            foreach (var ty in value.GetGenericArguments())   // todo: cache
+            
+            foreach (var ty in _genericArgumentsCache.GetValue(value, x => x.GetGenericArguments()))
             {
                 _typeReferenceFormatter.Serialize(writer, ty);
             }
@@ -191,17 +196,9 @@ public sealed class TypeFormatter : IFormatter<Type>
             }
             else
             {
-                var genericCount = 0;
-                var genericDefinition = value;
-
-                if (value.IsGenericTypeDefinition)
-                {
-                    genericDefinition = value.GetGenericTypeDefinition();
-                    genericCount = genericDefinition.GetGenericArguments().Length;  // todo: cache
-                }
-
-                writer.WriteUInt8((byte)TypeMetadata.Definition(genericCount));
-                writer.WriteString(NamespaceQualifiedName(genericDefinition), Encoding.ASCII);
+                var genericDefinition = value.IsGenericTypeDefinition ? value.GetGenericTypeDefinition() : value;
+                writer.WriteUInt8((byte)TypeMetadata.Definition());
+                writer.WriteString(genericDefinition.FullName!);
                 _assemblyFormatter.Serialize(writer, genericDefinition.Assembly);
             }
         }
@@ -235,20 +232,6 @@ public sealed class TypeFormatter : IFormatter<Type>
         if (value is null)
         {
             throw new InvalidDataException(message);
-        }
-    }
-
-    private static string NamespaceQualifiedName(Type type)
-    {
-        var result = string.IsNullOrEmpty(type.Namespace) ? type.Name : $"{type.Namespace}.{type.Name}";
-        var backTickIndex = result.LastIndexOf("`");
-        if (0 <= backTickIndex)
-        {
-            return result[..backTickIndex];
-        }
-        else
-        {
-            return result;
         }
     }
 
@@ -377,11 +360,10 @@ public sealed class TypeFormatter : IFormatter<Type>
         /// <summary>
         /// A non-generic type or an open generic type.
         /// </summary>
-        /// <param name="genericArity">The number of generic arguments.</param>
         /// <returns>The associated metadata.</returns>
-        public static TypeMetadata Definition(int genericArity)
+        public static TypeMetadata Definition()
         {
-            return new TypeMetadata(TypeKind.Definition, genericArity);
+            return new TypeMetadata(TypeKind.Definition, 0);
         }
 
         /// <summary>

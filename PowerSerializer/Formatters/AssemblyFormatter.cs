@@ -48,7 +48,7 @@ public sealed class AssemblyFormatter : IFormatter<Assembly>
         }
         else
         {
-            var name = reader.ReadString(Encoding.ASCII);
+            var name = reader.ReadString();
             var version = new Version(reader.ReadVarInt32(), reader.ReadVarInt32(), reader.ReadVarInt32(), reader.ReadVarInt32());
             value = _assemblyLoader.LoadFromAssemblyName(new AssemblyName() { Name = name, Version = version });
         }
@@ -75,7 +75,7 @@ public sealed class AssemblyFormatter : IFormatter<Assembly>
             else
             {
                 writer.WriteBool(false);
-                writer.WriteString(name, Encoding.ASCII);
+                writer.WriteString(name);
                 writer.WriteVarInt32(version?.Major ?? 0);
                 writer.WriteVarInt32(version?.Minor ?? 0);
                 writer.WriteVarInt32(version?.Build ?? 0);

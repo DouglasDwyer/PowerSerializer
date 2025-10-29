@@ -56,7 +56,7 @@ public sealed class PowerSerializer
     }
 
     /// <inheritdoc cref="Serialize{T}(IBufferWriter{byte}, in T)"/>
-    public ArraySegment<byte> Serialize<T>(in T value)
+    public ArraySegment<byte> Serialize<T>(in T? value)
     {
         var writer = new ArrayBufferWriter<byte>();
         Serialize(writer, value);

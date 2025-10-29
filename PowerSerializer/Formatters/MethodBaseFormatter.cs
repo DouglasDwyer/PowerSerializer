@@ -50,7 +50,7 @@ public sealed class MethodBaseFormatter : IFormatter<MethodBase>
         {
             value = OpenGenericPlaceholder.Instance;
 
-            var name = reader.ReadString(Encoding.ASCII);
+            var name = reader.ReadString();
             var genericParameterCount = reader.ReadUInt8();
             var parameterCount = reader.ReadUInt8();
 
@@ -76,7 +76,7 @@ public sealed class MethodBaseFormatter : IFormatter<MethodBase>
         else
         {
             writer.WriteBool(false);
-            writer.WriteString(value.Name, Encoding.ASCII);
+            writer.WriteString(value.Name);
             writer.WriteUInt8((byte)genericArguments.Length);
 
             var parameters = value.GetParameters();
